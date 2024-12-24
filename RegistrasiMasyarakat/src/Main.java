@@ -7,6 +7,18 @@
  *
  * @author m marsa n j
  */
+import view.UserProfileView;
+
 public class Main {
-    
+    public static void main(String[] args) {
+        // Membuat instance dari ProfileUserView
+        UserProfileView UserProfileView = new UserProfileView();
+
+        // Menampilkan tampilan ProfileUserView
+        UserProfileView.setVisible(true);
+
+        // Menentukan posisi window di tengah layar
+        UserProfileView.setLocationRelativeTo(null);
+    }
 }
+
