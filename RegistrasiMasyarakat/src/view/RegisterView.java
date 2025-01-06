@@ -1,16 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package view;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
-/**
- *
- * @author diaza
- */
+
 public class RegisterView extends JFrame {
     private JTextField txtUsername;
     private JPasswordField txtPassword;
