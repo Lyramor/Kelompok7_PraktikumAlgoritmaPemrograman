@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/Main.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/model/MyBatisUtil.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/util/OTPUtil.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/LoginView.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/OTPDialog.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/model/UserMapper.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/model/UserModel.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/HalamanUtamaView.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/UserProfileView.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/main/Main.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/ResetPasswordDialog.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/controller/UserController.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/ForgotPasswordView.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/KategoriSampahView.java</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/mybatis-config.xml</file>
+            <file>file:/D:/Unpas_223040083/Semester5/tess/Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/view/RegisterView.java</file>
+        </group>
+    </open-files>
 </project-private>

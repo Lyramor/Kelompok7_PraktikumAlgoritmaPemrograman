@@ -5,6 +5,9 @@ public class UserModel {
     private String username;
     private String password;
     private String email;
+private String photoPath; // Cocok dengan alias "photoPath" di query
+    private String address;
+    private String phoneNumber; // Cocok dengan alias "phoneNumber" di query
     
     // Constructor
     public UserModel() {
@@ -50,5 +53,29 @@ public class UserModel {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+    
+    public String getPhotoPath() {
+        return photoPath;
+    }
+    
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
+    
+    public String getAddress() {
+        return address;
+    }
+    
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

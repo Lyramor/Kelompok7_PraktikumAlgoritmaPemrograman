@@ -23,8 +23,8 @@ public class OTPUtil {
     // Send OTP via email
     public static void sendOTPEmail(String email, String otp) throws MessagingException {
         // Konfigurasi email pengirim (gunakan email Gmail Anda)
-        String senderEmail = "diaz.223040024@mail.unpas.ac.id"; // Ganti dengan email Anda
-        String senderPassword = "bmax ddqi wpjg zqdu"; // Ganti dengan App Password dari Gmail
+        String senderEmail = "mmarsanj2435@gmail.com"; // Ganti dengan email Anda
+        String senderPassword = "hxbg rgyn siog gyof"; // Ganti dengan App Password dari Gmail
         
         // Setup mail server properties
         Properties properties = new Properties();
