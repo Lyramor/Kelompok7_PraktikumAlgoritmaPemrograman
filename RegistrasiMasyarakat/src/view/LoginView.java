@@ -108,7 +108,7 @@ public class LoginView extends JFrame {
         contentPanel.add(btnGoToRegister, gbc);
         
         gbc.gridy = 6; // Pastikan posisi sesuai dengan layout Anda
-contentPanel.add(btnForgotPassword, gbc);
+        contentPanel.add(btnForgotPassword, gbc);
         
         // Add panels to main panel
         mainPanel.add(titlePanel, BorderLayout.NORTH);
