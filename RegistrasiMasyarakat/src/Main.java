@@ -1,12 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+import controller.UserController;
+import model.UserModel;
+import view.LoginView;
+import view.RegisterView;
 
-/**
- *
- * @author m marsa n j
- */
 public class Main {
-    
+    public static void main(String[] args) {
+        // Create instances of model and views
+        UserModel model = new UserModel();
+        LoginView loginView = new LoginView();
+        RegisterView registerView = new RegisterView();
+
+        // Create controller
+        UserController controller = new UserController(model, loginView, registerView);
+
+        // Start the application
+        controller.start();
+    }
 }
