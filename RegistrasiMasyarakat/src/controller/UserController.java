@@ -10,7 +10,6 @@
     import util.MyBatisUtil;
     import view.*;
     import util.*;
-    import TokenController;
     import org.apache.ibatis.session.SqlSession;
     import javax.mail.MessagingException;
     import javax.swing.SwingUtilities;
@@ -23,14 +22,14 @@
         private RegisterView registerView;
         private String currentOTP;
         private long otpGenerationTime;
-        private static final long OTP_VALIDITY_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-        private static final long VERIFICATION_CODE_DURATION = 5 * 60 * 1000;
+        private static final long OTP_EXPIRY_TIME = 15 * 60 * 1000;
+        private static final long SESSION_EXPIRY_TIME = 24 * 60 * 60 * 1000;
         private ForgotPasswordView forgotPasswordView;
         private String resetCode;
         private String resetEmail;
         private UserProfileView userProfileView;
         private UserModel loggedInUser;
-        private static final String UPLOAD_DIRECTORY = "uploads/profile_photos";
+        private static final String UPLOAD_DIRECTORY = "Kelompok7_PraktikumPemrograman/RegistrasiMasyarakat/src/upload/profile_photos";
         private static final long MAX_FILE_SIZE = 5 * 1024 * 1024;
         private boolean validateRegistrationInput(String username, String password, String email, String phoneNumber) {
             // Validasi username
@@ -76,81 +75,39 @@
             this.forgotPasswordView.addBackToLoginListener(e -> showLogin());
         }
 
-        private void login() {
-            String username = loginView.getUsername();
-            String password = loginView.getPassword();
-            String hashedPassword = UtilityHelper.hashPassword(password);
+            private void login() {
+                String username = loginView.getUsername();
+                String password = loginView.getPassword();
+                String hashedPassword = UtilityHelper.hashPassword(password);
 
-            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                UserMapper mapper = session.getMapper(UserMapper.class);
-                UserModel user = mapper.findByUsernameAndPassword(username, hashedPassword);
+                try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                    UserMapper userMapper = session.getMapper(UserMapper.class);
+                    SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
 
-                if (user != null) {
-                    // Cek verifikasi
-                    if (!user.isVerified()) {
-                        loginView.showMessage("Akun belum diverifikasi. Silakan cek email Anda untuk verifikasi.");
-                        return;
+                    UserModel user = userMapper.findByUsernameAndPassword(username, hashedPassword);
+
+                    if (user != null) {
+                        // Generate session token
+                        String token = JWTUtil.generateToken(user.getId());
+                        Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + SESSION_EXPIRY_TIME);
+
+                        // Save session
+                        sessionMapper.insert(user.getId(), token, expiresAt);
+                        session.commit();
+
+                        // Set logged in user and save token
+                        this.loggedInUser = user;
+                        SessionManager.getInstance().setToken(token);
+
+                        loginView.showMessage("Login berhasil!");
+                        openHalamanUtamaView();
+                    } else {
+                        loginView.showMessage("Username atau password salah!");
                     }
-
-                    // Generate dan simpan token
-                    String token = JWTUtil.generateToken(user.getId());
-                    Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + (24 * 60 * 60 * 1000)); // 24 jam
-
-                    TokenMapper tokenMapper = session.getMapper(TokenMapper.class);
-                    tokenMapper.deleteUserTokens(user.getId()); // Hapus token lama
-                    tokenMapper.insertToken(user.getId(), token, expiresAt);
-
-                    session.commit();
-
-                    // Set logged in user dan simpan token
-                    this.loggedInUser = user;
-                    SessionManager.getInstance().setToken(token);
-
-                    loginView.showMessage("Login berhasil!");
-                    openHalamanUtamaView();
-                } else {
-                    loginView.showMessage("Username atau password salah!");
+                } catch (Exception ex) {
+                    loginView.showMessage("Error: " + ex.getMessage());
                 }
-            } catch (Exception ex) {
-                loginView.showMessage("Error: " + ex.getMessage());
             }
-        }
-
-    //    private void verifyOTP(UserModel user) {
-    //        OTPDialog otpDialog = new OTPDialog(loginView);
-    //        otpDialog.addVerifyListener(e -> {
-    //            String enteredOTP = otpDialog.getOTP();
-    //            long currentTime = System.currentTimeMillis();
-    //
-    //            // Check if OTP is expired
-    //            if (currentTime - otpGenerationTime > OTP_VALIDITY_DURATION) {
-    //                loginView.showMessage("OTP has expired! Please login again.");
-    //                otpDialog.dispose();
-    //                return;
-    //            }
-    //
-    //            // Verify OTP
-    //            if (enteredOTP.equals(currentOTP)) {
-    //                otpDialog.setVerified(true);
-    //                otpDialog.dispose();
-    //                loginView.showMessage("Login successful!");
-    //
-    //                // Arahkan ke HalamanUtamaView
-    //                HalamanUtamaView halamanUtama = new HalamanUtamaView();
-    //                halamanUtama.setVisible(true);
-    //                loginView.dispose(); // Menutup loginView jika diperlukan
-    //            } else {
-    //                loginView.showMessage("Invalid OTP! Please try again.");
-    //            }
-    //        });
-    //
-    //        otpDialog.setVisible(true);
-    //
-    //        // Check if verification was successful
-    //        if (!otpDialog.isVerified()) {
-    //            loginView.showMessage("Login cancelled or failed!");
-    //        }
-    //    }
 
         private void register() {
             String username = registerView.getUsername();
@@ -163,51 +120,67 @@
             }
 
             try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                UserMapper mapper = session.getMapper(UserMapper.class);
+                UserMapper userMapper = session.getMapper(UserMapper.class);
+                OTPVerificationMapper otpMapper = session.getMapper(OTPVerificationMapper.class);
 
-                if (mapper.findByUsername(username) != null) {
+                // Check if username or email already exists
+                if (userMapper.findByUsername(username) != null) {
                     registerView.showMessage("Username sudah digunakan!");
                     return;
                 }
-                if (mapper.findByEmail(email) != null) {
+                if (userMapper.findByEmail(email) != null) {
                     registerView.showMessage("Email sudah terdaftar!");
                     return;
                 }
 
-                String verificationCode = OTPUtil.generateOTP();
-                long currentTimeMillis = System.currentTimeMillis();
-                java.sql.Timestamp codeExpiry = new java.sql.Timestamp(currentTimeMillis + VERIFICATION_CODE_DURATION);
+                // Generate OTP
+                String otpCode = OTPUtil.generateOTP();
+                Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + OTP_EXPIRY_TIME);
 
-                int result = mapper.insertWithVerification(
-                        username,
-                        UtilityHelper.hashPassword(password),
-                        email,
-                        phoneNumber,
-                        verificationCode,
-                        codeExpiry
-                );
+                System.out.println("Debug - Email: " + email);
+                System.out.println("Debug - OTP Code: " + otpCode);
+                System.out.println("Debug - Expires At: " + expiresAt);
 
-                session.commit();
+                try {
+                    // Delete existing unverified OTPs for this email
+                    otpMapper.deleteByEmail(email);
 
-                if (result > 0) {
-                    try {
-                        OTPUtil.sendOTPEmail(email, verificationCode);
-                        registerView.showMessage("Registrasi berhasil! Silakan cek email untuk verifikasi.");
+                    // Insert new OTP verification
+                    int insertResult = otpMapper.insert(email, otpCode, expiresAt);
+                    System.out.println("Debug - Insert Result: " + insertResult);
 
-                        controller.TokenController tokenController = new TokenController();
-                        showVerificationDialog(email, tokenController);
-                    } catch (Exception ex) {
-                        registerView.showMessage("Registrasi berhasil tetapi gagal mengirim email: " + ex.getMessage());
+                    if (insertResult > 0) {
+                        session.commit();
+
+                        OTPVerification savedOTP = otpMapper.findByEmail(email);
+                        System.out.println("Debug - Saved OTP: " + (savedOTP != null ? savedOTP.getOtpCode() : "null"));
+
+                        // Send OTP email
+                        OTPUtil.sendOTPEmail(email, otpCode);
+                        registerView.showMessage("Kode verifikasi telah dikirim ke email Anda.");
+
+                        // Show verification dialog
+                        TokenController tokenController = new TokenController();
+                        showVerificationDialog(email, tokenController, session, userMapper, username, password, phoneNumber);
+                    } else {
+                        session.rollback();
+                        registerView.showMessage("Gagal menyimpan data verifikasi!");
                     }
-                } else {
-                    registerView.showMessage("Registrasi gagal!");
+                } catch (MessagingException ex) {
+                    session.rollback();
+                    registerView.showMessage("Gagal mengirim email verifikasi: " + ex.getMessage());
+                    ex.printStackTrace();
                 }
             } catch (Exception ex) {
                 registerView.showMessage("Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
 
-        private void showVerificationDialog(String email, TokenController tokenController) {
+
+
+        private void showVerificationDialog(String email, TokenController tokenController, SqlSession session,
+                                            UserMapper userMapper, String username, String password, String phoneNumber) {
             OTPDialog otpDialog = new OTPDialog(registerView);
 
             otpDialog.addVerifyListener(e -> {
@@ -221,9 +194,30 @@
                 boolean isVerified = tokenController.verifyOTP(email, otpInput);
 
                 if (isVerified) {
-                    otpDialog.dispose();
-                    registerView.showMessage("Verifikasi berhasil! Silakan login.");
-                    showLogin();
+                    try {
+                        // Hash the password
+                        String hashedPassword = UtilityHelper.hashPassword(password);
+
+                        // Save user to database
+                        int insertResult = userMapper.insertWithVerification(
+                                username, hashedPassword, email, phoneNumber
+                        );
+
+
+                        if (insertResult > 0) {
+                            session.commit();
+                            otpDialog.dispose();
+                            registerView.showMessage("Registrasi berhasil! Silakan login.");
+                            showLogin();
+                        } else {
+                            session.rollback();
+                            registerView.showMessage("Gagal menyimpan data pengguna!");
+                        }
+                    } catch (Exception ex) {
+                        session.rollback();
+                        registerView.showMessage("Error: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
                 } else {
                     registerView.showMessage("Kode OTP salah atau sudah kadaluarsa!");
                 }
@@ -231,6 +225,8 @@
 
             otpDialog.setVisible(true);
         }
+
+
 
         private void showLogin() {
             loginView.setVisible(true);
@@ -323,47 +319,6 @@
             dialog.setVisible(true);
         }
 
-
-//        private void verifyOTP(UserModel user) {
-//        OTPDialog otpDialog = new OTPDialog(loginView);
-//        otpDialog.addVerifyListener(e -> {
-//            String enteredOTP = otpDialog.getOTP();
-//            long currentTime = System.currentTimeMillis();
-//
-//            if (currentTime - otpGenerationTime > OTP_VALIDITY_DURATION) {
-//                loginView.showMessage("OTP has expired! Please login again.");
-//                otpDialog.dispose();
-//                return;
-//            }
-//
-//            if (enteredOTP.equals(currentOTP)) {
-//                otpDialog.setVerified(true);
-//                otpDialog.dispose();
-//                loginView.showMessage("Login successful!");
-//
-//                // Set logged in user
-//                this.loggedInUser = user;
-//
-//                // Pastikan loginView ditutup
-//                loginView.setVisible(false);
-//                loginView.dispose();
-//
-//                // Buka halaman utama menggunakan SwingUtilities.invokeLater
-//                SwingUtilities.invokeLater(() -> {
-//                    try {
-//                        openHalamanUtamaView();
-//                    } catch (Exception ex) {
-//                        System.err.println("Error opening main page: " + ex.getMessage());
-//                        ex.printStackTrace();
-//                    }
-//                });
-//            } else {
-//                loginView.showMessage("Invalid OTP! Please try again.");
-//            }
-//        });
-//
-//        otpDialog.setVisible(true);
-//    }
 
          public void openHalamanUtamaView() {
         System.out.println("Membuka Halaman Utama...");

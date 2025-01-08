@@ -12,12 +12,16 @@ public class OTPUtil {
     public static String generateOTP() {
         Random random = new Random();
         StringBuilder otp = new StringBuilder();
-        
+
         for (int i = 0; i < OTP_LENGTH; i++) {
             otp.append(random.nextInt(10));
         }
-        
-        return otp.toString();
+
+        // Tambah log untuk memastikan OTP dibuat
+        String generatedOTP = otp.toString();
+        System.out.println("Debug - Generated OTP: " + generatedOTP);
+
+        return generatedOTP;
     }
     
     // Send OTP via email
