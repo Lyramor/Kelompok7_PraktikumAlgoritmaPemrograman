@@ -1,24 +1,19 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author m marsa n j
- */
-import view.UserProfileView;
+import controller.UserController;
+import model.UserModel;
+import view.LoginView;
+import view.RegisterView;
 
 public class Main {
     public static void main(String[] args) {
-        // Membuat instance dari ProfileUserView
-        UserProfileView UserProfileView = new UserProfileView();
+        // Create instances of model and views
+        UserModel model = new UserModel();
+        LoginView loginView = new LoginView();
+        RegisterView registerView = new RegisterView();
 
-        // Menampilkan tampilan ProfileUserView
-        UserProfileView.setVisible(true);
+        // Create controller
+        UserController controller = new UserController(model, loginView, registerView);
 
-        // Menentukan posisi window di tengah layar
-        UserProfileView.setLocationRelativeTo(null);
+        // Start the application
+        controller.start();
     }
 }
-

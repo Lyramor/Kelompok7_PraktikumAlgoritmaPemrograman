@@ -12,19 +12,23 @@ public class OTPUtil {
     public static String generateOTP() {
         Random random = new Random();
         StringBuilder otp = new StringBuilder();
-        
+
         for (int i = 0; i < OTP_LENGTH; i++) {
             otp.append(random.nextInt(10));
         }
-        
-        return otp.toString();
+
+        // Tambah log untuk memastikan OTP dibuat
+        String generatedOTP = otp.toString();
+        System.out.println("Debug - Generated OTP: " + generatedOTP);
+
+        return generatedOTP;
     }
     
     // Send OTP via email
     public static void sendOTPEmail(String email, String otp) throws MessagingException {
         // Konfigurasi email pengirim (gunakan email Gmail Anda)
-        String senderEmail = "diaz.223040024@mail.unpas.ac.id"; // Ganti dengan email Anda
-        String senderPassword = "bmax ddqi wpjg zqdu"; // Ganti dengan App Password dari Gmail
+        String senderEmail = "mmarsanj2435@gmail.com"; // Ganti dengan email Anda
+        String senderPassword = "hxbg rgyn siog gyof"; // Ganti dengan App Password dari Gmail
         
         // Setup mail server properties
         Properties properties = new Properties();
