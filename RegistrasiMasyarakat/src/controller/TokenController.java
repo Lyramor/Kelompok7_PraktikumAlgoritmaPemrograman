@@ -1,56 +1,66 @@
 package controller;
 
-import model.UserMapper;
-import model.UserModel;
+import model.OTPVerification;
+import model.OTPVerificationMapper;
 import org.apache.ibatis.session.SqlSession;
 import util.MyBatisUtil;
 
 import java.sql.Timestamp;
 
 public class TokenController {
-
     public boolean verifyOTP(String email, String otpInput) {
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            UserMapper userMapper = session.getMapper(UserMapper.class);
-            UserModel user = userMapper.findByEmail(email);
+        if (email == null || otpInput == null || email.trim().isEmpty() || otpInput.trim().isEmpty()) {
+            System.out.println("Error: Email or OTP input is null or empty");
+            return false;
+        }
 
-            if (user == null) {
-                System.out.println("Error: User not found for email: " + email);
-                return false;
-            }
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            OTPVerificationMapper otpMapper = session.getMapper(OTPVerificationMapper.class);
+
+            // Get the latest unverified OTP verification record
+            OTPVerification verification = otpMapper.findByEmail(email);
 
             // Debug log
-            System.out.println("Database OTP: " + user.getVerificationCode());
-            System.out.println("Input OTP: " + otpInput);
-            System.out.println("OTP expiry time: " + user.getVerificationCodeExpiry());
-            System.out.println("Current time: " + new Timestamp(System.currentTimeMillis()));
+            System.out.println("Debug - Verification found: " + (verification != null));
+            if (verification != null) {
+                System.out.println("Debug - DB OTP Code: " + verification.getOtpCode());
+                System.out.println("Debug - DB is_verified: " + verification.isVerified());
+            }
 
-            // Periksa apakah kode verifikasi sudah kadaluarsa
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            if (user.getVerificationCodeExpiry() != null && currentTime.after(user.getVerificationCodeExpiry())) {
-                System.out.println("Error: OTP has expired.");
+            if (verification == null) {
+                System.out.println("Error: No OTP verification found for email: " + email);
                 return false;
             }
 
-            // Periksa apakah OTP cocok
-            if (otpInput.trim().equals(user.getVerificationCode().trim())) {
-                int result = userMapper.verifyUser(email, otpInput);
-                session.commit();
-
-                if (result > 0) {
-                    System.out.println("User verified successfully!");
-                    return true;
-                } else {
-                    System.out.println("Error: Failed to update verification status in database.");
-                }
-            } else {
-                System.out.println("Error: OTP does not match.");
+            // Validate OTP code
+            if (!otpInput.equals(verification.getOtpCode())) {
+                System.out.println("Error: Invalid OTP");
+                return false;
             }
+
+            // Validate expiry
+            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            if (currentTime.after(verification.getExpiresAt())) {
+                System.out.println("Error: OTP has expired");
+                return false;
+            }
+
+            // If OTP is valid, update is_verified to true
+            int rowsUpdated = otpMapper.markAsVerified(email);
+            if (rowsUpdated > 0) {
+                System.out.println("Success: OTP marked as verified.");
+                session.commit();
+                return true;
+            } else {
+                System.out.println("Error: Failed to update OTP verification status.");
+                session.rollback();
+                return false;
+            }
+
         } catch (Exception ex) {
             System.err.println("Exception during OTP verification: " + ex.getMessage());
             ex.printStackTrace();
+            return false;
         }
-        return false;
     }
 }
-

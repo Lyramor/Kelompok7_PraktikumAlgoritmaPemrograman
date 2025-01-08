@@ -1,4 +1,3 @@
-
 import controller.UserController;
 import model.UserModel;
 import view.LoginView;
@@ -10,10 +9,10 @@ public class Main {
         UserModel model = new UserModel();
         LoginView loginView = new LoginView();
         RegisterView registerView = new RegisterView();
-        
+
         // Create controller
         UserController controller = new UserController(model, loginView, registerView);
-        
+
         // Start the application
         controller.start();
     }

@@ -14,5 +14,8 @@
   </environments>
   <mappers>
     <mapper class="model.UserMapper"/>
+    <mapper class="model.OTPVerificationMapper"/>
+    <mapper class="model.SessionMapper"/>
+
   </mappers>
 </configuration>
