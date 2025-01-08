@@ -11,57 +11,67 @@ public class ResetPasswordDialog extends JDialog {
     private JButton btnReset;
     private JButton btnCancel;
     private boolean resetSuccess = false;
-    
+
     public ResetPasswordDialog(JFrame parent) {
         super(parent, "Reset Password", true);
         initComponents();
     }
-    
+
     private void initComponents() {
-        setSize(350, 250);
+        setSize(400, 300); // Perbesar ukuran dialog
         setLocationRelativeTo(getParent());
         setLayout(new BorderLayout());
-        
+
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        
+        gbc.insets = new Insets(10, 10, 10, 10); // Tambahkan margin antar komponen
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Komponen akan mengisi ruang horizontal
+
         // Components
-        txtResetCode = new JTextField(20);
-        txtNewPassword = new JPasswordField(20);
-        txtConfirmPassword = new JPasswordField(20);
+        txtResetCode = new JTextField();
+        txtNewPassword = new JPasswordField();
+        txtConfirmPassword = new JPasswordField();
         btnReset = new JButton("Reset Password");
         btnCancel = new JButton("Cancel");
-        
+
         // Layout
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0; // Label tidak memperluas ruang
         panel.add(new JLabel("Reset Code:"), gbc);
-        
+
         gbc.gridx = 1;
+        gbc.weightx = 1; // Field input diperluas
         panel.add(txtResetCode, gbc);
-        
-        gbc.gridx = 0; gbc.gridy = 1;
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0;
         panel.add(new JLabel("New Password:"), gbc);
-        
+
         gbc.gridx = 1;
+        gbc.weightx = 1;
         panel.add(txtNewPassword, gbc);
-        
-        gbc.gridx = 0; gbc.gridy = 2;
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 0;
         panel.add(new JLabel("Confirm Password:"), gbc);
-        
+
         gbc.gridx = 1;
+        gbc.weightx = 1;
         panel.add(txtConfirmPassword, gbc);
-        
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         buttonPanel.add(btnReset);
         buttonPanel.add(btnCancel);
-        
+
         add(panel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
-        
+
         btnCancel.addActionListener(e -> dispose());
     }
+
     
     public String getResetCode() {
         return txtResetCode.getText();
