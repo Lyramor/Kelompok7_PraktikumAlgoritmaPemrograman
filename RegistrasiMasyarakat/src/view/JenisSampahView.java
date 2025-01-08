@@ -9,6 +9,7 @@ public class JenisSampahView extends JFrame {
     private JButton btnKaca;
     private JButton btnKomponenElektronik;
     private JButton btnBaterai;
+    private JButton btnKembali;
 
     public JenisSampahView() {
         // Set up the frame
@@ -23,11 +24,26 @@ public class JenisSampahView extends JFrame {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(new Color(245, 245, 245));
 
+        // Back button panel
+        JPanel backButtonPanel = new JPanel();
+        backButtonPanel.setLayout(new BorderLayout());
+        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
+
+        btnKembali = new JButton("← Kembali");
+        btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnKembali.setForeground(new Color(70, 130, 180));
+        btnKembali.setBorderPainted(false);
+        btnKembali.setContentAreaFilled(false);
+        btnKembali.setFocusPainted(false);
+
+        backButtonPanel.add(btnKembali, BorderLayout.WEST);
+
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
         titlePanel.setBackground(new Color(245, 245, 245));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
 
         JLabel lblTitle = new JLabel("Jenis Sampah", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
@@ -70,8 +86,9 @@ public class JenisSampahView extends JFrame {
         buttonPanel.add(btnBaterai, gbc);
 
         // Add panels to main panel
-        mainPanel.add(titlePanel, BorderLayout.NORTH);
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(backButtonPanel, BorderLayout.NORTH);
+        mainPanel.add(titlePanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add main panel to frame
         add(mainPanel);

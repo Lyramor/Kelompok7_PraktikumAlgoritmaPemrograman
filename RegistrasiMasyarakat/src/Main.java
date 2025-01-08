@@ -1,19 +1,20 @@
 import controller.UserController;
 import model.UserModel;
-import view.LoginView;
-import view.RegisterView;
+import view.HalamanUtamaView;
+import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
-        // Create instances of model and views
-        UserModel model = new UserModel();
-        LoginView loginView = new LoginView();
-        RegisterView registerView = new RegisterView();
+        SwingUtilities.invokeLater(() -> {
+            // Create instances of model and HalamanUtamaView
+            UserModel userModel = new UserModel();
+            HalamanUtamaView halamanUtamaView = new HalamanUtamaView();
 
-        // Create controller
-        UserController controller = new UserController(model, loginView, registerView);
+            // Create controller
+            UserController controller = new UserController(userModel, halamanUtamaView);
 
-        // Start the application
-        controller.start();
+            // Start by showing HalamanUtama
+            halamanUtamaView.setVisible(true);
+        });
     }
 }

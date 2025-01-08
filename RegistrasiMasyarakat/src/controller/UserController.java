@@ -12,9 +12,8 @@
     import util.*;
     import org.apache.ibatis.session.SqlSession;
     import javax.mail.MessagingException;
-    import javax.swing.SwingUtilities;
+    import javax.swing.*;
     import java.sql.Timestamp;
-    import java.util.Date;
 
     public class UserController {
         private UserModel model;
@@ -22,6 +21,7 @@
         private RegisterView registerView;
         private String currentOTP;
         private long otpGenerationTime;
+        private HalamanUtamaView halamanUtamaView;
         private static final long OTP_EXPIRY_TIME = 15 * 60 * 1000;
         private static final long SESSION_EXPIRY_TIME = 24 * 60 * 60 * 1000;
         private ForgotPasswordView forgotPasswordView;
@@ -59,23 +59,61 @@
             return true; // Semua validasi berhasil
         }
 
-        public UserController(UserModel model, LoginView loginView, RegisterView registerView) {
-            this.model = model;
-            this.loginView = loginView;
-            this.registerView = registerView;
+        public UserController(UserModel userModel, HalamanUtamaView halamanUtamaView) {
+            this.model = userModel;
+            this.loginView = new LoginView();
+            this.registerView = new RegisterView();
+            this.forgotPasswordView = new ForgotPasswordView();
+            this.halamanUtamaView = halamanUtamaView;
 
-            // Add listeners
             this.loginView.addLoginListener(e -> login());
             this.loginView.addRegisterNavigationListener(e -> showRegister());
+            this.loginView.addForgotPasswordListener(e -> showForgotPassword());
+
             this.registerView.addRegisterListener(e -> register());
             this.registerView.addLoginNavigationListener(e -> showLogin());
-            this.forgotPasswordView = new ForgotPasswordView();
-            this.loginView.addForgotPasswordListener(e -> showForgotPassword());
+
             this.forgotPasswordView.addSendCodeListener(e -> handleForgotPassword());
             this.forgotPasswordView.addBackToLoginListener(e -> showLogin());
+
+            setupHalamanUtamaListeners();
         }
 
-            private void login() {
+        private void setupHalamanUtamaListeners() {
+            halamanUtamaView.addProfileButtonListener(e -> {
+                if (loggedInUser != null) {
+                    halamanUtamaView.dispose();
+                    showUserProfile(loggedInUser);
+                } else {
+                    halamanUtamaView.showMessage("Silakan login terlebih dahulu!");
+                    showLogin();
+                }
+            });
+
+            halamanUtamaView.addKategoriSampahButtonListener(e -> {
+                halamanUtamaView.dispose();
+                new KategoriSampahView().setVisible(true);
+            });
+
+            halamanUtamaView.addJenisSampahButtonListener(e -> {
+                halamanUtamaView.dispose();
+                new JenisSampahView().setVisible(true);
+            });
+
+            halamanUtamaView.addLoginButtonListener(e -> {
+                halamanUtamaView.dispose();
+                showLogin();
+            });
+
+            halamanUtamaView.addLogoutButtonListener(e -> {
+                SessionManager.getInstance().setToken(null);
+                loggedInUser = null;
+                halamanUtamaView.showMessage("Logout berhasil!");
+            });
+        }
+
+
+        private void login() {
                 String username = loginView.getUsername();
                 String password = loginView.getPassword();
                 String hashedPassword = UtilityHelper.hashPassword(password);
@@ -179,75 +217,94 @@
 
 
 
-        private void showVerificationDialog(String email, TokenController tokenController, SqlSession session,
-                                            UserMapper userMapper, String username, String password, String phoneNumber) {
-            OTPDialog otpDialog = new OTPDialog(registerView);
+    private void showVerificationDialog(String email, TokenController tokenController, SqlSession session,
+                                        UserMapper userMapper, String username, String password, String phoneNumber) {
+        OTPDialog otpDialog = new OTPDialog(registerView);
 
-            otpDialog.addVerifyListener(e -> {
-                String otpInput = otpDialog.getOTP().trim();
+        otpDialog.addVerifyListener(e -> {
+            String otpInput = otpDialog.getOTP().trim();
 
-                if (otpInput.isEmpty()) {
-                    registerView.showMessage("Kode OTP tidak boleh kosong!");
-                    return;
-                }
+            if (otpInput.isEmpty()) {
+                registerView.showMessage("Kode OTP tidak boleh kosong!");
+                return;
+            }
 
-                boolean isVerified = tokenController.verifyOTP(email, otpInput);
+            boolean isVerified = tokenController.verifyOTP(email, otpInput);
 
-                if (isVerified) {
-                    try {
-                        // Hash the password
-                        String hashedPassword = UtilityHelper.hashPassword(password);
+            if (isVerified) {
+                try {
+                    // Hash the password
+                    String hashedPassword = UtilityHelper.hashPassword(password);
 
-                        // Save user to database
-                        int insertResult = userMapper.insertWithVerification(
-                                username, hashedPassword, email, phoneNumber
-                        );
+                    // Save user to database
+                    int insertResult = userMapper.insertWithVerification(
+                            username, hashedPassword, email, phoneNumber
+                    );
 
 
-                        if (insertResult > 0) {
-                            session.commit();
-                            otpDialog.dispose();
-                            registerView.showMessage("Registrasi berhasil! Silakan login.");
-                            showLogin();
-                        } else {
-                            session.rollback();
-                            registerView.showMessage("Gagal menyimpan data pengguna!");
-                        }
-                    } catch (Exception ex) {
+                    if (insertResult > 0) {
+                        session.commit();
+                        otpDialog.dispose();
+                        registerView.showMessage("Registrasi berhasil! Silakan login.");
+                        showLogin();
+                    } else {
                         session.rollback();
-                        registerView.showMessage("Error: " + ex.getMessage());
-                        ex.printStackTrace();
+                        registerView.showMessage("Gagal menyimpan data pengguna!");
                     }
-                } else {
-                    registerView.showMessage("Kode OTP salah atau sudah kadaluarsa!");
+                } catch (Exception ex) {
+                    session.rollback();
+                    registerView.showMessage("Error: " + ex.getMessage());
+                    ex.printStackTrace();
                 }
-            });
+            } else {
+                registerView.showMessage("Kode OTP salah atau sudah kadaluarsa!");
+            }
+        });
 
-            otpDialog.setVisible(true);
-        }
+        otpDialog.setVisible(true);
+    }
 
+    public void start() {
+        halamanUtamaView.setVisible(true);
+    }
 
+    private void showForgotPassword() {
+        loginView.setVisible(false);
+        forgotPasswordView.setVisible(true);
+    }
 
-        private void showLogin() {
-            loginView.setVisible(true);
+    public void showLogin() {
+        loginView.setVisible(true);
+        registerView.setVisible(false);
+
+        // Listener untuk tombol kembali
+        loginView.addBackButtonListener(e -> {
+            loginView.setVisible(false);
+            openHalamanUtamaView();
+        });
+    }
+
+    public void showRegister() {
+        registerView.setVisible(true);
+        loginView.setVisible(false);
+
+        // Listener untuk tombol kembali
+        registerView.addBackButtonListener(e -> {
             registerView.setVisible(false);
-        }
+            openHalamanUtamaView();
+        });
+    }
 
-        private void showRegister() {
-            registerView.setVisible(true);
-            loginView.setVisible(false);
-        }
+    public void navigateToHalamanUtama() {
+        new HalamanUtamaView().setVisible(true);
+    }
 
-        public void start() {
-            loginView.setVisible(true);
-        }
+    public void navigateToJenisSampah() {
+        new JenisSampahView().setVisible(true);
+    }
 
-        private void showForgotPassword() {
-            loginView.setVisible(false);
-            forgotPasswordView.setVisible(true);
-        }
 
-        private void handleForgotPassword() {
+    private void handleForgotPassword() {
             String email = forgotPasswordView.getEmail();
 
             if (!UtilityHelper.isValidEmail(email)) {
@@ -279,7 +336,7 @@
             }
         }
 
-        private void showResetPasswordDialog() {
+    private void showResetPasswordDialog() {
             ResetPasswordDialog dialog = new ResetPasswordDialog(forgotPasswordView);
             dialog.addResetListener(e -> {
                 String enteredCode = dialog.getResetCode();
@@ -319,65 +376,15 @@
             dialog.setVisible(true);
         }
 
-
-         public void openHalamanUtamaView() {
-        System.out.println("Membuka Halaman Utama...");
-
-        // Buat instance baru HalamanUtamaView
-        HalamanUtamaView halamanUtama = new HalamanUtamaView();
-
-        // Tambahkan listener untuk tombol profile
-        halamanUtama.addProfileButtonListener(e -> {
-            System.out.println("Tombol Profile diklik!");
-            if (loggedInUser != null) {
-                halamanUtama.dispose();
-                showUserProfile(loggedInUser);
-            } else {
-                System.out.println("Error: User data tidak ditemukan!");
-                halamanUtama.showMessage("Error: User data tidak ditemukan!");
-            }
-        });
-
-        // Tambahkan listener untuk tombol kategori sampah
-        halamanUtama.addKategoriSampahButtonListener(e -> {
-            System.out.println("Tombol Kategori Sampah diklik!");
-            halamanUtama.dispose();
-            KategoriSampahView kategoriSampahView = new KategoriSampahView();
-            kategoriSampahView.setVisible(true);
-        });
-
-        // Tampilkan halaman utama
-        halamanUtama.setVisible(true);
-        System.out.println("Halaman Utama ditampilkan");
-    }{
-            HalamanUtamaView halamanUtama = new HalamanUtamaView();
-
-            // Add profile button listener
-            halamanUtama.addProfileButtonListener(e -> {
-                System.out.println("Profile button clicked");
-                if (loggedInUser != null) {
-                    halamanUtama.dispose();
-                    showUserProfile(loggedInUser);
-                } else {
-                    halamanUtama.showMessage("Error: User data not found!");
-                }
-            });
-
-            // Add kategori sampah button listener
-            halamanUtama.addKategoriSampahButtonListener(e -> {
-                System.out.println("Kategori Sampah button clicked");
-                halamanUtama.dispose();
-                KategoriSampahView kategoriSampahView = new KategoriSampahView();
-                kategoriSampahView.setVisible(true);
-            });
-
-            // Show the main page
-            halamanUtama.setVisible(true);
-            System.out.println("HalamanUtamaView opened");
+    public void openHalamanUtamaView() {
+        if (halamanUtamaView != null) {
+            halamanUtamaView.dispose();
         }
 
-
-
+        halamanUtamaView = new HalamanUtamaView();
+        setupHalamanUtamaListeners();
+        halamanUtamaView.setVisible(true);
+    }
 
     public void showUserProfile(UserModel user) {
         if (user == null) {
@@ -409,6 +416,8 @@
         // Display the profile view
         userProfileView.setVisible(true);
         System.out.println("UserProfileView opened for user: " + user.getUsername());
+
+        userProfileView.addDeleteAccountListener(e -> handleAccountDeletion());
     }
         private void updateProfile() {
             // Validasi input
@@ -583,5 +592,51 @@
             }
         }
 
+        private void handleAccountDeletion() {
+            if (loggedInUser == null) {
+                userProfileView.showMessage("No user logged in!");
+                return;
+            }
+
+            // Show confirmation dialog
+            int confirm = JOptionPane.showConfirmDialog(
+                    userProfileView,
+                    "Are you sure you want to delete your account? This action cannot be undone.",
+                    "Confirm Account Deletion",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                    UserMapper mapper = session.getMapper(UserMapper.class);
+                    SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
+
+                    // First deactivate all sessions
+                    sessionMapper.deactivateUserSessions(loggedInUser.getId());
+
+                    // Then delete the user
+                    int result = mapper.deleteUser(loggedInUser.getId());
+
+                    if (result > 0) {
+                        session.commit();
+
+                        // Clear session
+                        SessionManager.getInstance().clearSession();
+                        loggedInUser = null;
+
+                        userProfileView.showMessage("Account successfully deleted!");
+                        userProfileView.dispose();
+                        openHalamanUtamaView();
+                    } else {
+                        session.rollback();
+                        userProfileView.showMessage("Failed to delete account!");
+                    }
+                } catch (Exception ex) {
+                    userProfileView.showMessage("Error deleting account: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        }
 
     }
