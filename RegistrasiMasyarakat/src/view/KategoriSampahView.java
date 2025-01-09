@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public class KategoriSampahView extends JFrame {
     private JButton btnKembali;
@@ -88,6 +89,11 @@ public class KategoriSampahView extends JFrame {
 
         // Debugging: Output untuk memastikan tampilan dibuat
         System.out.println("KategoriSampahView initialized");
+    }
+
+    // Method untuk menambahkan listener tombol kembali
+    public void addBackButtonListener(ActionListener listener) {
+        btnKembali.addActionListener(listener);
     }
 
     public static void main(String[] args) {

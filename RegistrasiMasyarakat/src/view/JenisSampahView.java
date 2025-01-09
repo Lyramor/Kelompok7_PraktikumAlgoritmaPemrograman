@@ -2,6 +2,8 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+
 
 public class JenisSampahView extends JFrame {
     private JButton btnLogam;
@@ -95,6 +97,11 @@ public class JenisSampahView extends JFrame {
 
         // Debugging: Output untuk memastikan frame berhasil diinisialisasi
         System.out.println("Jenis Sampah View initialized");
+    }
+
+    // Method untuk menambahkan listener tombol kembali
+    public void addBackButtonListener(ActionListener listener) {
+        btnKembali.addActionListener(listener);
     }
 
     private JButton createLeftAlignedButton(String text) {
