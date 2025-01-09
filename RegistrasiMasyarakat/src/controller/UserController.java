@@ -19,6 +19,8 @@
         private UserModel model;
         private LoginView loginView;
         private RegisterView registerView;
+        private KategoriSampahView kategoriSampahView;
+        private JenisSampahView jenisSampahView;
         private String currentOTP;
         private long otpGenerationTime;
         private HalamanUtamaView halamanUtamaView;
@@ -92,12 +94,12 @@
 
             halamanUtamaView.addKategoriSampahButtonListener(e -> {
                 halamanUtamaView.dispose();
-                new KategoriSampahView().setVisible(true);
+                showKategoriSampah();
             });
 
             halamanUtamaView.addJenisSampahButtonListener(e -> {
                 halamanUtamaView.dispose();
-                new JenisSampahView().setVisible(true);
+                showJenisSampah();
             });
 
             halamanUtamaView.addLoginButtonListener(e -> {
@@ -303,6 +305,35 @@
         new JenisSampahView().setVisible(true);
     }
 
+        public void showKategoriSampah() {
+            if (kategoriSampahView != null) {
+                kategoriSampahView.dispose();
+            }
+            kategoriSampahView = new KategoriSampahView();
+
+            // Menambahkan listener untuk tombol kembali
+            kategoriSampahView.addBackButtonListener(e -> {
+                kategoriSampahView.dispose();
+                openHalamanUtamaView();
+            });
+
+            kategoriSampahView.setVisible(true);
+        }
+
+        public void showJenisSampah() {
+            if (jenisSampahView != null) {
+                jenisSampahView.dispose();
+            }
+            jenisSampahView = new JenisSampahView();
+
+            // Menambahkan listener untuk tombol kembali
+            jenisSampahView.addBackButtonListener(e -> {
+                jenisSampahView.dispose();
+                openHalamanUtamaView();
+            });
+
+            jenisSampahView.setVisible(true);
+        }
 
     private void handleForgotPassword() {
             String email = forgotPasswordView.getEmail();
