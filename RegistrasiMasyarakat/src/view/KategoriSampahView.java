@@ -4,6 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class KategoriSampahView extends JFrame {
+    private JButton btnKembali;
+
     public KategoriSampahView() {
         // Set up the frame
         setTitle("Kategori Sampah");
@@ -17,11 +19,26 @@ public class KategoriSampahView extends JFrame {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(new Color(245, 245, 245));
 
+        // Back Button Panel
+        JPanel backButtonPanel = new JPanel();
+        backButtonPanel.setLayout(new BorderLayout());
+        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
+
+        btnKembali = new JButton("← Kembali");
+        btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnKembali.setForeground(new Color(70, 130, 180));
+        btnKembali.setBorderPainted(false);
+        btnKembali.setContentAreaFilled(false);
+        btnKembali.setFocusPainted(false);
+
+        backButtonPanel.add(btnKembali, BorderLayout.WEST);
+
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
         titlePanel.setBackground(new Color(245, 245, 245));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
 
         JLabel lblTitle = new JLabel("Kategori Sampah", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
@@ -39,11 +56,11 @@ public class KategoriSampahView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         String[] kategori = {
-            "Sampah Elektronik Rumah Tangga",
-            "Sampah Elektronik Kantor",
-            "Sampah Elektronik Hiburan",
-            "Sampah Elektronik Komunikasi",
-            "Sampah Elektronik Kesehatan"
+                "Sampah Elektronik Rumah Tangga",
+                "Sampah Elektronik Kantor",
+                "Sampah Elektronik Hiburan",
+                "Sampah Elektronik Komunikasi",
+                "Sampah Elektronik Kesehatan"
         };
 
         for (int i = 0; i < kategori.length; i++) {
@@ -62,8 +79,9 @@ public class KategoriSampahView extends JFrame {
         }
 
         // Add panels to main panel
-        mainPanel.add(titlePanel, BorderLayout.NORTH);
-        mainPanel.add(buttonPanel, BorderLayout.CENTER);
+        mainPanel.add(backButtonPanel, BorderLayout.NORTH);
+        mainPanel.add(titlePanel, BorderLayout.CENTER);
+        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add main panel to frame
         add(mainPanel);
@@ -71,5 +89,11 @@ public class KategoriSampahView extends JFrame {
         // Debugging: Output untuk memastikan tampilan dibuat
         System.out.println("KategoriSampahView initialized");
     }
-}
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            KategoriSampahView kategoriSampahView = new KategoriSampahView();
+            kategoriSampahView.setVisible(true);
+        });
+    }
+}

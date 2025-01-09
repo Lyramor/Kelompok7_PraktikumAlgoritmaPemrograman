@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 public class HalamanUtamaView extends JFrame {
     private JButton btnHalamanProfile;
     private JButton btnKategoriSampah;
+    private JButton btnJenisSampah;
+    private JButton btnLogin;
+    private JButton btnLogout;
     private JLabel lblTitle;
 
     public HalamanUtamaView() {
@@ -59,6 +62,14 @@ public class HalamanUtamaView extends JFrame {
         btnKategoriSampah.setBorderPainted(false);
         btnKategoriSampah.setFocusPainted(false);
 
+        btnJenisSampah = new JButton("Jenis Sampah");
+        btnJenisSampah.setPreferredSize(new Dimension(300, 45));
+        btnJenisSampah.setFont(new Font("Arial", Font.BOLD, 14));
+        btnJenisSampah.setBackground(new Color(70, 130, 180));
+        btnJenisSampah.setForeground(Color.WHITE);
+        btnJenisSampah.setBorderPainted(false);
+        btnJenisSampah.setFocusPainted(false);
+
         // Add components to button panel
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -67,9 +78,38 @@ public class HalamanUtamaView extends JFrame {
         gbc.gridy = 1;
         buttonPanel.add(btnKategoriSampah, gbc);
 
+        gbc.gridy = 2;
+        buttonPanel.add(btnJenisSampah, gbc);
+
         // Add panels to main panel
         mainPanel.add(titlePanel, BorderLayout.NORTH);
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
+
+        // Bottom Panel for Login and Logout buttons
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new GridLayout(1, 2));
+        bottomPanel.setBackground(new Color(245, 245, 245));
+
+        btnLogin = new JButton("Login");
+        btnLogin.setFont(new Font("Arial", Font.BOLD, 12));
+        btnLogin.setBackground(new Color(70, 130, 180));
+        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setBorderPainted(false);
+        btnLogin.setFocusPainted(false);
+
+        btnLogout = new JButton("Logout");
+        btnLogout.setFont(new Font("Arial", Font.BOLD, 12));
+        btnLogout.setBackground(new Color(70, 130, 180));
+        btnLogout.setForeground(Color.WHITE);
+        btnLogout.setBorderPainted(false);
+        btnLogout.setFocusPainted(false);
+
+        // Add buttons to bottom panel
+        bottomPanel.add(btnLogin);
+        bottomPanel.add(btnLogout);
+
+        // Add bottom panel to main panel
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Add main panel to frame
         add(mainPanel);
@@ -89,7 +129,25 @@ public class HalamanUtamaView extends JFrame {
         btnKategoriSampah.addActionListener(listener);
     }
 
+    public void addJenisSampahButtonListener(ActionListener listener) {
+        System.out.println("Listener untuk Jenis Sampah ditambahkan");
+        btnJenisSampah.addActionListener(listener);
+    }
+
+    public void addLoginButtonListener(ActionListener listener) {
+        System.out.println("Listener untuk Login ditambahkan");
+        btnLogin.addActionListener(listener);
+    }
+
+    public void addLogoutButtonListener(ActionListener listener) {
+        System.out.println("Listener untuk Logout ditambahkan");
+        btnLogout.addActionListener(listener);
+    }
+
+
+
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
+
 }
