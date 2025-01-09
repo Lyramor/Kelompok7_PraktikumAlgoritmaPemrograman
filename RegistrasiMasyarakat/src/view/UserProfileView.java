@@ -7,6 +7,9 @@ import java.io.File;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import model.UserModel;
+import javax.swing.JPasswordField;
+import javax.swing.JDialog;
+import java.awt.event.ActionEvent;
 
 public class UserProfileView extends JFrame {
     private JTextField txtUsername;
@@ -19,11 +22,15 @@ public class UserProfileView extends JFrame {
     private JButton btnBack;
     private JButton btnDeleteAccount; // Tombol baru untuk hapus akun
     private String selectedPhotoPath;
+    private JButton btnChangePassword;
+    private JPasswordField txtCurrentPassword;
+    private JPasswordField txtNewPassword;
+    private JPasswordField txtConfirmPassword;
     private UserModel currentUser;
 
     public UserProfileView() {
         setTitle("User Profile");
-        setSize(500, 750); // Ukuran jendela ditambah agar dapat memuat tombol baru
+        setSize(500, 800); // Ukuran jendela ditambah agar dapat memuat tombol baru
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -60,9 +67,15 @@ public class UserProfileView extends JFrame {
         btnUpdate = new JButton("Update Profile");
         styleButton(btnUpdate);
 
+        //tombol change pw
+        btnChangePassword = new JButton("Change Password");
+        styleButton(btnChangePassword);
+
+        //btn back
         btnBack = new JButton("Back");
         styleButton(btnBack);
 
+        //btn hapus akun
         btnDeleteAccount = new JButton("Delete Account"); // Tombol untuk hapus akun
         styleButton(btnDeleteAccount); // Menambahkan gaya tombol
 
@@ -84,9 +97,12 @@ public class UserProfileView extends JFrame {
         contentPanel.add(btnUpdate, gbc);
 
         gbc.gridy = 11;
+        contentPanel.add(btnChangePassword, gbc);
+
+        gbc.gridy = 12;
         contentPanel.add(btnBack, gbc);
 
-        gbc.gridy = 12; // Tombol hapus akun berada di bawah tombol "Back"
+        gbc.gridy = 13;
         contentPanel.add(btnDeleteAccount, gbc);
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
@@ -217,4 +233,115 @@ public class UserProfileView extends JFrame {
     }
 
 
+    //method rubah pw
+    private void showChangePasswordDialog() {
+        JDialog dialog = new JDialog(this, "Change Password", true);
+        dialog.setSize(350, 350);
+        dialog.setLocationRelativeTo(this);
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        txtCurrentPassword = new JPasswordField(20);
+        txtNewPassword = new JPasswordField(20);
+        txtConfirmPassword = new JPasswordField(20);
+
+        // Styling password fields
+        stylePasswordField(txtCurrentPassword);
+        stylePasswordField(txtNewPassword);
+        stylePasswordField(txtConfirmPassword);
+
+        // Add components to panel
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JLabel("Current Password:"), gbc);
+        gbc.gridy = 1;
+        panel.add(txtCurrentPassword, gbc);
+
+        gbc.gridy = 2;
+        panel.add(new JLabel("New Password:"), gbc);
+        gbc.gridy = 3;
+        panel.add(txtNewPassword, gbc);
+
+        gbc.gridy = 4;
+        panel.add(new JLabel("Confirm Password:"), gbc);
+        gbc.gridy = 5;
+        panel.add(txtConfirmPassword, gbc);
+
+        JButton btnSubmit = new JButton("Change Password");
+        styleButton(btnSubmit);
+        gbc.gridy = 6;
+        gbc.insets = new Insets(15, 5, 5, 5);
+        panel.add(btnSubmit, gbc);
+
+        dialog.add(panel);
+
+        btnSubmit.addActionListener(e -> {
+            if (validatePasswordChange()) {
+                dialog.dispose();
+            }
+        });
+
+        dialog.setVisible(true);
+    }
+
+    private void stylePasswordField(JPasswordField field) {
+        field.setPreferredSize(new Dimension(300, 35));
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        field.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(204, 204, 204)),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)));
+    }
+
+    private boolean validatePasswordChange() {
+        String currentPass = new String(txtCurrentPassword.getPassword());
+        String newPass = new String(txtNewPassword.getPassword());
+        String confirmPass = new String(txtConfirmPassword.getPassword());
+
+        if (currentPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
+            showMessage("All fields are required!");
+            return false;
+        }
+
+        if (!newPass.equals(confirmPass)) {
+            showMessage("New password and confirm password do not match!");
+            return false;
+        }
+
+        if (newPass.length() < 6) {
+            showMessage("New password must be at least 6 characters long!");
+            return false;
+        }
+
+        return true;
+    }
+
+    // Tambahkan getter untuk password
+    public String getCurrentPassword() {
+        return new String(txtCurrentPassword.getPassword());
+    }
+
+    public String getNewPassword() {
+        return new String(txtNewPassword.getPassword());
+    }
+
+    // Tambahkan method untuk listener change password
+    public void addChangePasswordListener(ActionListener listener) {
+        btnChangePassword.addActionListener(e -> {
+            showChangePasswordDialog();
+            if (validatePasswordChange()) {
+                String currentPassword = new String(txtCurrentPassword.getPassword());
+                String newPassword = new String(txtNewPassword.getPassword());
+                listener.actionPerformed(new ActionEvent(
+                        this,
+                        ActionEvent.ACTION_PERFORMED,
+                        currentPassword + "," + newPassword
+                ));
+            }
+        });
+    }
 }
+
+
