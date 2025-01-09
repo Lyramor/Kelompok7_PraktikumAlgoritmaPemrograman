@@ -14,6 +14,9 @@
     import javax.mail.MessagingException;
     import javax.swing.*;
     import java.sql.Timestamp;
+    import java.awt.event.ActionEvent;
+    import java.awt.event.ActionListener;
+    import util.UtilityHelper;
 
     public class UserController {
         private UserModel model;
@@ -112,6 +115,8 @@
                 loggedInUser = null;
                 halamanUtamaView.showMessage("Logout berhasil!");
             });
+
+
         }
 
 
@@ -444,6 +449,16 @@
             openHalamanUtamaView();
         });
 
+        // listener untuk change password
+        userProfileView.addChangePasswordListener(e -> {
+            String[] passwords = e.getActionCommand().split(",");
+            if (passwords.length == 2) {
+                handlePasswordChange(passwords[0], passwords[1]);
+            } else {
+                userProfileView.showMessage("Invalid password data received!");
+            }
+        });
+
         // Display the profile view
         userProfileView.setVisible(true);
         System.out.println("UserProfileView opened for user: " + user.getUsername());
@@ -623,6 +638,39 @@
             }
         }
 
+
+        // rubah password
+        private void handlePasswordChange(String currentPassword, String newPassword) {
+            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                UserMapper mapper = session.getMapper(UserMapper.class);
+
+                // Verifikasi password lama
+                String hashedCurrentPassword = UtilityHelper.hashPassword(currentPassword);
+                UserModel user = mapper.findByUsernameAndPassword(loggedInUser.getUsername(), hashedCurrentPassword);
+
+                if (user == null) {
+                    userProfileView.showMessage("Current password is incorrect!");
+                    return;
+                }
+
+                // Update password baru
+                String hashedNewPassword = UtilityHelper.hashPassword(newPassword);
+                int result = mapper.updatePassword(user.getEmail(), hashedNewPassword);
+                session.commit();
+
+                if (result > 0) {
+                    userProfileView.showMessage("Password successfully updated!");
+                } else {
+                    userProfileView.showMessage("Failed to update password!");
+                }
+            } catch (Exception ex) {
+                userProfileView.showMessage("Error: " + ex.getMessage());
+            }
+        }
+
+
+
+        //hapus akun
         private void handleAccountDeletion() {
             if (loggedInUser == null) {
                 userProfileView.showMessage("No user logged in!");

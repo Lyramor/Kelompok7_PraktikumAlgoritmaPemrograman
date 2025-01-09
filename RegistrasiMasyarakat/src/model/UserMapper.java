@@ -91,6 +91,8 @@ public interface UserMapper {
     @Update("UPDATE users SET photo_path = #{photoPath} WHERE id = #{id}")
     int updatePhotoPath(@Param("id") int id, @Param("photoPath") String photoPath);
 
+
+
     @Delete("DELETE FROM users WHERE id = #{id}")
     int deleteUser(@Param("id") int id);
 
