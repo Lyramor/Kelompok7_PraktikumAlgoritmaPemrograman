@@ -318,15 +318,6 @@ public class UserProfileView extends JFrame {
         return true;
     }
 
-    // Tambahkan getter untuk password
-    public String getCurrentPassword() {
-        return new String(txtCurrentPassword.getPassword());
-    }
-
-    public String getNewPassword() {
-        return new String(txtNewPassword.getPassword());
-    }
-
     // Tambahkan method untuk listener change password
     public void addChangePasswordListener(ActionListener listener) {
         btnChangePassword.addActionListener(e -> {

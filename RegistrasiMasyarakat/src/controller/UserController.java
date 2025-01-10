@@ -14,12 +14,11 @@
     import javax.mail.MessagingException;
     import javax.swing.*;
     import java.sql.Timestamp;
-    import java.awt.event.ActionEvent;
-    import java.awt.event.ActionListener;
     import util.UtilityHelper;
 
     public class UserController {
         private UserModel model;
+        private HalamanAwalView halamanAwalView;
         private LoginView loginView;
         private RegisterView registerView;
         private KategoriSampahView kategoriSampahView;
@@ -64,12 +63,13 @@
             return true; // Semua validasi berhasil
         }
 
-        public UserController(UserModel userModel, HalamanUtamaView halamanUtamaView) {
+        public UserController(UserModel userModel, HalamanAwalView halamanAwalView) {
             this.model = userModel;
+            this.halamanAwalView = halamanAwalView;
             this.loginView = new LoginView();
             this.registerView = new RegisterView();
             this.forgotPasswordView = new ForgotPasswordView();
-            this.halamanUtamaView = halamanUtamaView;
+            this.halamanUtamaView = new HalamanUtamaView();
 
             this.loginView.addLoginListener(e -> login());
             this.loginView.addRegisterNavigationListener(e -> showRegister());
@@ -82,6 +82,24 @@
             this.forgotPasswordView.addBackToLoginListener(e -> showLogin());
 
             setupHalamanUtamaListeners();
+            setupHalamanAwalListeners();
+        }
+
+        public void showHalamanAwal() {
+            halamanAwalView.setVisible(true);
+            loginView.setVisible(false);
+            registerView.setVisible(false);
+        }
+        private void setupHalamanAwalListeners() {
+            halamanAwalView.addLoginButtonListener(e -> {
+                halamanAwalView.setVisible(false);
+                showLogin();
+            });
+
+            halamanAwalView.addRegisterButtonListener(e -> {
+                halamanAwalView.setVisible(false);
+                showRegister();
+            });
         }
 
         private void setupHalamanUtamaListeners() {
@@ -115,10 +133,7 @@
                 loggedInUser = null;
                 halamanUtamaView.showMessage("Logout berhasil!");
             });
-
-
         }
-
 
         private void login() {
                 String username = loginView.getUsername();
@@ -271,10 +286,6 @@
         otpDialog.setVisible(true);
     }
 
-    public void start() {
-        halamanUtamaView.setVisible(true);
-    }
-
     private void showForgotPassword() {
         loginView.setVisible(false);
         forgotPasswordView.setVisible(true);
@@ -287,6 +298,7 @@
         // Listener untuk tombol kembali
         loginView.addBackButtonListener(e -> {
             loginView.setVisible(false);
+            loginView.dispose();
             openHalamanUtamaView();
         });
     }
@@ -298,16 +310,9 @@
         // Listener untuk tombol kembali
         registerView.addBackButtonListener(e -> {
             registerView.setVisible(false);
+            registerView.dispose();
             openHalamanUtamaView();
         });
-    }
-
-    public void navigateToHalamanUtama() {
-        new HalamanUtamaView().setVisible(true);
-    }
-
-    public void navigateToJenisSampah() {
-        new JenisSampahView().setVisible(true);
     }
 
         public void showKategoriSampah() {
@@ -497,7 +502,7 @@
                     loggedInUser.getId(),
                     newUsername,
                     newEmail,
-                    loggedInUser.getPhotoPath(), // Gunakan photo path yang ada di model
+                    loggedInUser.getPhotoPath(),
                     userProfileView.getAddress(),
                     userProfileView.getPhoneNumber()
                 );
@@ -603,7 +608,6 @@
                 userProfileView.showMessage("Format file tidak didukung! Gunakan JPG, JPEG, PNG, atau GIF");
                 return false;
             }
-
             return true;
         }
 
@@ -690,17 +694,22 @@
                 try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
                     UserMapper mapper = session.getMapper(UserMapper.class);
                     SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
+                    OTPVerificationMapper otpMapper = session.getMapper(OTPVerificationMapper.class);
 
-                    // First deactivate all sessions
+                    // Get user email before deletion
+                    String userEmail = loggedInUser.getEmail();
+
+                    // Deactivate all sessions
                     sessionMapper.deactivateUserSessions(loggedInUser.getId());
 
-                    // Then delete the user
+                    // Delete OTP verifications
+                    otpMapper.deleteByEmail(userEmail);
+
+                    // Delete the user
                     int result = mapper.deleteUser(loggedInUser.getId());
 
                     if (result > 0) {
                         session.commit();
-
-                        // Clear session
                         SessionManager.getInstance().clearSession();
                         loggedInUser = null;
 
