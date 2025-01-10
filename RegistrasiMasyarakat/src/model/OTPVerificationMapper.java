@@ -17,6 +17,6 @@
                 "WHERE email = #{email} AND is_verified = false")
         int markAsVerified(@Param("email") String email);
 
-        @Delete("DELETE FROM otp_verifications WHERE email = #{email} AND is_verified = false")
+        @Delete("DELETE FROM otp_verifications WHERE email = #{email}")
         int deleteByEmail(@Param("email") String email);
     }
