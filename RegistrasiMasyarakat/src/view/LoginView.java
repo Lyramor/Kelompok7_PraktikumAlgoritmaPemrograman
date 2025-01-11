@@ -12,7 +12,6 @@ public class LoginView extends JFrame {
     private JButton btnGoToRegister;
     private JButton btnForgotPassword;
     private JLabel lblTitle;
-    private JButton btnBack;
 
     public LoginView() {
         // Set up the frame
@@ -26,21 +25,6 @@ public class LoginView extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(new Color(230, 230, 230));
-
-        // Back button panel
-        JPanel backButtonPanel = new JPanel();
-        backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(230, 230, 230));
-        backButtonPanel.setBorder(new EmptyBorder(10, 20, 0, 20));
-
-        btnBack = new JButton("← Back");
-        btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBack.setForeground(new Color(1, 88, 88));
-        btnBack.setBorderPainted(false);
-        btnBack.setContentAreaFilled(false);
-        btnBack.setFocusPainted(false);
-
-        backButtonPanel.add(btnBack, BorderLayout.WEST);
 
         // Title panel
         JPanel titlePanel = new JPanel();
@@ -120,9 +104,8 @@ public class LoginView extends JFrame {
         contentPanel.add(btnForgotPassword, gbc);
 
         // Add panels to main panel
-        mainPanel.add(backButtonPanel, BorderLayout.NORTH);
-        mainPanel.add(titlePanel, BorderLayout.CENTER);
-        mainPanel.add(contentPanel, BorderLayout.SOUTH);
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
 
         // Add main panel to frame
         add(mainPanel);
@@ -152,9 +135,5 @@ public class LoginView extends JFrame {
 
     public void addForgotPasswordListener(ActionListener listener) {
         btnForgotPassword.addActionListener(listener);
-    }
-
-    public void addBackButtonListener(ActionListener listener) {
-        btnBack.addActionListener(listener);
     }
 }

@@ -13,7 +13,6 @@ public class RegisterView extends JFrame {
     private JButton btnRegister;
     private JButton btnBackToLogin;
     private JLabel lblTitle;
-    private JButton btnBack;
 
     public RegisterView() {
         // Frame setup
@@ -27,21 +26,6 @@ public class RegisterView extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(new Color(230, 230, 230)); // Light gray
-
-        // Back button panel
-        JPanel backButtonPanel = new JPanel();
-        backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(230, 230, 230));
-        backButtonPanel.setBorder(new EmptyBorder(10, 20, 0, 20));
-
-        btnBack = new JButton("← Back");
-        btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBack.setForeground(new Color(1, 88, 88)); // Teal
-        btnBack.setBorderPainted(false);
-        btnBack.setContentAreaFilled(false);
-        btnBack.setFocusPainted(false);
-
-        backButtonPanel.add(btnBack, BorderLayout.WEST);
 
         // Title panel
         JPanel titlePanel = new JPanel();
@@ -134,9 +118,8 @@ public class RegisterView extends JFrame {
         contentPanel.add(btnBackToLogin, gbc);
 
         // Add panels to main panel
-        mainPanel.add(backButtonPanel, BorderLayout.NORTH);
-        mainPanel.add(titlePanel, BorderLayout.CENTER);
-        mainPanel.add(contentPanel, BorderLayout.SOUTH);
+        mainPanel.add(titlePanel, BorderLayout.NORTH);
+        mainPanel.add(contentPanel, BorderLayout.CENTER);
 
         // Add main panel to frame
         add(mainPanel);
@@ -170,9 +153,5 @@ public class RegisterView extends JFrame {
 
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
-    }
-
-    public void addBackButtonListener(ActionListener listener) {
-        btnBack.addActionListener(listener);
     }
 }
