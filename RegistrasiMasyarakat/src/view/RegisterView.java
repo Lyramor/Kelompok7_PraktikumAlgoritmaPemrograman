@@ -26,17 +26,17 @@ public class RegisterView extends JFrame {
         // Main panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Light gray
 
         // Back button panel
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBackground(new Color(230, 230, 230));
         backButtonPanel.setBorder(new EmptyBorder(10, 20, 0, 20));
 
         btnBack = new JButton("← Back");
         btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBack.setForeground(new Color(70, 130, 180));
+        btnBack.setForeground(new Color(1, 88, 88)); // Teal
         btnBack.setBorderPainted(false);
         btnBack.setContentAreaFilled(false);
         btnBack.setFocusPainted(false);
@@ -46,18 +46,18 @@ public class RegisterView extends JFrame {
         // Title panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230));
         titlePanel.setBorder(new EmptyBorder(10, 20, 20, 20));
 
         lblTitle = new JLabel("REGISTER", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
-        lblTitle.setForeground(new Color(51, 51, 51));
+        lblTitle.setForeground(new Color(51, 51, 51)); // Dark gray
         titlePanel.add(lblTitle, BorderLayout.CENTER);
 
         // Content panel
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
-        contentPanel.setBackground(new Color(245, 245, 245));
+        contentPanel.setBackground(new Color(230, 230, 230));
         contentPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,41 +69,41 @@ public class RegisterView extends JFrame {
         txtUsername.setPreferredSize(new Dimension(300, 40));
         txtUsername.setFont(new Font("Arial", Font.PLAIN, 14));
         txtUsername.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(204, 204, 204)),
+                BorderFactory.createLineBorder(new Color(1, 88, 88)), // Teal border
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         txtEmail = new JTextField(20);
         txtEmail.setPreferredSize(new Dimension(300, 40));
         txtEmail.setFont(new Font("Arial", Font.PLAIN, 14));
         txtEmail.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(204, 204, 204)),
+                BorderFactory.createLineBorder(new Color(1, 88, 88)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         txtPhoneNumber = new JTextField(20);
         txtPhoneNumber.setPreferredSize(new Dimension(300, 40));
         txtPhoneNumber.setFont(new Font("Arial", Font.PLAIN, 14));
         txtPhoneNumber.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(204, 204, 204)),
+                BorderFactory.createLineBorder(new Color(1, 88, 88)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         txtPassword = new JPasswordField(20);
         txtPassword.setPreferredSize(new Dimension(300, 40));
         txtPassword.setFont(new Font("Arial", Font.PLAIN, 14));
         txtPassword.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(204, 204, 204)),
+                BorderFactory.createLineBorder(new Color(1, 88, 88)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
 
         btnRegister = new JButton("REGISTER");
         btnRegister.setPreferredSize(new Dimension(300, 45));
         btnRegister.setFont(new Font("Arial", Font.BOLD, 14));
-        btnRegister.setBackground(new Color(70, 130, 180));
+        btnRegister.setBackground(new Color(1, 88, 88)); // Teal background
         btnRegister.setForeground(Color.WHITE);
         btnRegister.setBorderPainted(false);
         btnRegister.setFocusPainted(false);
 
         btnBackToLogin = new JButton("Already have an account? Login");
         btnBackToLogin.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBackToLogin.setForeground(new Color(70, 130, 180));
+        btnBackToLogin.setForeground(new Color(1, 88, 88));
         btnBackToLogin.setBorderPainted(false);
         btnBackToLogin.setContentAreaFilled(false);
         btnBackToLogin.setFocusPainted(false);
@@ -141,6 +141,7 @@ public class RegisterView extends JFrame {
         // Add main panel to frame
         add(mainPanel);
     }
+
     // Getters
     public String getUsername() {
         return txtUsername.getText();

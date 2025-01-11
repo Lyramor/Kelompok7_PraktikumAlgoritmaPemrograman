@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-
 public class JenisSampahView extends JFrame {
     private JButton btnLogam;
     private JButton btnPlastik;
@@ -24,17 +23,17 @@ public class JenisSampahView extends JFrame {
         // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Sama seperti HalamanAwalView
 
         // Back button panel
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBackground(new Color(230, 230, 230));
         backButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
 
-        btnKembali = new JButton("← Kembali");
+        btnKembali = new JButton("\u2190 Kembali"); // Unicode untuk panah kiri
         btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnKembali.setForeground(new Color(70, 130, 180));
+        btnKembali.setForeground(new Color(1, 88, 88)); // Warna teks
         btnKembali.setBorderPainted(false);
         btnKembali.setContentAreaFilled(false);
         btnKembali.setFocusPainted(false);
@@ -44,7 +43,7 @@ public class JenisSampahView extends JFrame {
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
 
         JLabel lblTitle = new JLabel("Jenis Sampah", SwingConstants.CENTER);
@@ -55,7 +54,7 @@ public class JenisSampahView extends JFrame {
         // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        buttonPanel.setBackground(new Color(230, 230, 230)); // Sama seperti HalamanAwalView
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -63,11 +62,11 @@ public class JenisSampahView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Buttons
-        btnLogam = createLeftAlignedButton("Logam");
-        btnPlastik = createLeftAlignedButton("Plastik");
-        btnKaca = createLeftAlignedButton("Kaca");
-        btnKomponenElektronik = createLeftAlignedButton("Komponen Elektronik");
-        btnBaterai = createLeftAlignedButton("Baterai");
+        btnLogam = createStyledButton("Logam");
+        btnPlastik = createStyledButton("Plastik");
+        btnKaca = createStyledButton("Kaca");
+        btnKomponenElektronik = createStyledButton("Komponen Elektronik");
+        btnBaterai = createStyledButton("Baterai");
 
         // Add buttons to button panel
         gbc.gridx = 0;
@@ -104,13 +103,13 @@ public class JenisSampahView extends JFrame {
         btnKembali.addActionListener(listener);
     }
 
-    private JButton createLeftAlignedButton(String text) {
+    private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(300, 45));
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(70, 130, 180));
+        button.setBackground(new Color(1, 88, 88)); // Warna tombol sama seperti HalamanAwalView
         button.setForeground(Color.WHITE);
-        button.setHorizontalAlignment(SwingConstants.LEFT); // Align text to the left
+        button.setHorizontalAlignment(SwingConstants.CENTER);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
         return button;

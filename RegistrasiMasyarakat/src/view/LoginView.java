@@ -25,17 +25,17 @@ public class LoginView extends JFrame {
         // Main Panel with background color
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230));
 
         // Back button panel
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBackground(new Color(230, 230, 230));
         backButtonPanel.setBorder(new EmptyBorder(10, 20, 0, 20));
 
         btnBack = new JButton("← Back");
         btnBack.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBack.setForeground(new Color(70, 130, 180));
+        btnBack.setForeground(new Color(1, 88, 88));
         btnBack.setBorderPainted(false);
         btnBack.setContentAreaFilled(false);
         btnBack.setFocusPainted(false);
@@ -45,7 +45,7 @@ public class LoginView extends JFrame {
         // Title panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230));
         titlePanel.setBorder(new EmptyBorder(10, 20, 20, 20));
 
         lblTitle = new JLabel("LOGIN", SwingConstants.CENTER);
@@ -56,7 +56,7 @@ public class LoginView extends JFrame {
         // Content Panel
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
-        contentPanel.setBackground(new Color(245, 245, 245));
+        contentPanel.setBackground(new Color(230, 230, 230));
         contentPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,21 +81,21 @@ public class LoginView extends JFrame {
         btnLogin = new JButton("LOGIN");
         btnLogin.setPreferredSize(new Dimension(300, 45));
         btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        btnLogin.setBackground(new Color(70, 130, 180));
+        btnLogin.setBackground(new Color(1, 88, 88));
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBorderPainted(false);
         btnLogin.setFocusPainted(false);
 
         btnGoToRegister = new JButton("Don't have an account? Register");
         btnGoToRegister.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnGoToRegister.setForeground(new Color(70, 130, 180));
+        btnGoToRegister.setForeground(new Color(1, 88, 88));
         btnGoToRegister.setBorderPainted(false);
         btnGoToRegister.setContentAreaFilled(false);
         btnGoToRegister.setFocusPainted(false);
 
         btnForgotPassword = new JButton("Forgot Password?");
         btnForgotPassword.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnForgotPassword.setForeground(new Color(70, 130, 180));
+        btnForgotPassword.setForeground(new Color(1, 88, 88));
         btnForgotPassword.setBorderPainted(false);
         btnForgotPassword.setContentAreaFilled(false);
         btnForgotPassword.setFocusPainted(false);
@@ -127,6 +127,7 @@ public class LoginView extends JFrame {
         // Add main panel to frame
         add(mainPanel);
     }
+
     // Getters
     public String getUsername() {
         return txtUsername.getText();
