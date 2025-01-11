@@ -8,7 +8,6 @@ public class HalamanUtamaView extends JFrame {
     private JButton btnHalamanProfile;
     private JButton btnKategoriSampah;
     private JButton btnJenisSampah;
-    private JButton btnLogin;
     private JButton btnLogout;
     private JLabel titleLabel;
     private JLabel subtitleLabel;
@@ -59,29 +58,10 @@ public class HalamanUtamaView extends JFrame {
         gbc.insets = new Insets(20, 10, 20, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        btnHalamanProfile = new JButton("Halaman Profile");
-        btnHalamanProfile.setPreferredSize(new Dimension(300, 45));
-        btnHalamanProfile.setFont(new Font("Arial", Font.BOLD, 14));
-        btnHalamanProfile.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnHalamanProfile.setForeground(Color.WHITE);
-        btnHalamanProfile.setBorderPainted(false);
-        btnHalamanProfile.setFocusPainted(false);
-
-        btnKategoriSampah = new JButton("Kategori Sampah");
-        btnKategoriSampah.setPreferredSize(new Dimension(300, 45));
-        btnKategoriSampah.setFont(new Font("Arial", Font.BOLD, 14));
-        btnKategoriSampah.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnKategoriSampah.setForeground(Color.WHITE);
-        btnKategoriSampah.setBorderPainted(false);
-        btnKategoriSampah.setFocusPainted(false);
-
-        btnJenisSampah = new JButton("Jenis Sampah");
-        btnJenisSampah.setPreferredSize(new Dimension(300, 45));
-        btnJenisSampah.setFont(new Font("Arial", Font.BOLD, 14));
-        btnJenisSampah.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnJenisSampah.setForeground(Color.WHITE);
-        btnJenisSampah.setBorderPainted(false);
-        btnJenisSampah.setFocusPainted(false);
+        btnHalamanProfile = createStyledButton("Halaman Profile");
+        btnKategoriSampah = createStyledButton("Kategori Sampah");
+        btnJenisSampah = createStyledButton("Jenis Sampah");
+        btnLogout = createStyledButton("Logout");
 
         // Add components to button panel
         gbc.gridx = 0;
@@ -94,41 +74,30 @@ public class HalamanUtamaView extends JFrame {
         gbc.gridy = 2;
         buttonPanel.add(btnJenisSampah, gbc);
 
+        gbc.gridy = 3;
+        buttonPanel.add(btnLogout, gbc);
+
         // Add panels to main panel
         mainPanel.add(titlePanel, BorderLayout.NORTH);
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
-
-        // Bottom Panel for Login and Logout buttons
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new GridLayout(1, 2));
-        bottomPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk panel bawah
-
-        btnLogin = new JButton("Login");
-        btnLogin.setFont(new Font("Arial", Font.BOLD, 12));
-        btnLogin.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnLogin.setForeground(Color.WHITE);
-        btnLogin.setBorderPainted(false);
-        btnLogin.setFocusPainted(false);
-
-        btnLogout = new JButton("Logout");
-        btnLogout.setFont(new Font("Arial", Font.BOLD, 12));
-        btnLogout.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnLogout.setForeground(Color.WHITE);
-        btnLogout.setBorderPainted(false);
-        btnLogout.setFocusPainted(false);
-
-        // Add buttons to bottom panel
-        bottomPanel.add(btnLogin);
-        bottomPanel.add(btnLogout);
-
-        // Add bottom panel to main panel
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         // Add main panel to frame
         add(mainPanel);
 
         // Debugging: Output untuk memastikan listener dipasang
         System.out.println("View initialized");
+    }
+
+    // Helper method to create a styled button
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(300, 45));
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(1, 88, 88)); // Warna tombol
+        button.setForeground(Color.WHITE);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        return button;
     }
 
     // Add action listeners
@@ -145,11 +114,6 @@ public class HalamanUtamaView extends JFrame {
     public void addJenisSampahButtonListener(ActionListener listener) {
         System.out.println("Listener untuk Jenis Sampah ditambahkan");
         btnJenisSampah.addActionListener(listener);
-    }
-
-    public void addLoginButtonListener(ActionListener listener) {
-        System.out.println("Listener untuk Login ditambahkan");
-        btnLogin.addActionListener(listener);
     }
 
     public void addLogoutButtonListener(ActionListener listener) {

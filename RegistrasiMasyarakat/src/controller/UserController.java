@@ -124,14 +124,11 @@
                 showJenisSampah();
             });
 
-            halamanUtamaView.addLoginButtonListener(e -> {
-                halamanUtamaView.dispose();
-                showLogin();
-            });
-
             halamanUtamaView.addLogoutButtonListener(e -> {
                 SessionManager.getInstance().setToken(null);
                 loggedInUser = null;
+                halamanUtamaView.dispose();
+                showHalamanAwal();
                 halamanUtamaView.showMessage("Logout berhasil!");
             });
         }
@@ -310,56 +307,30 @@
     public void showLogin() {
         loginView.setVisible(true);
         registerView.setVisible(false);
-
-        // Listener untuk tombol kembali
-        loginView.addBackButtonListener(e -> {
-            loginView.setVisible(false);
-            loginView.dispose();
-            openHalamanUtamaView();
-        });
     }
 
     public void showRegister() {
         registerView.setVisible(true);
         loginView.setVisible(false);
-
-        // Listener untuk tombol kembali
-        registerView.addBackButtonListener(e -> {
-            registerView.setVisible(false);
-            registerView.dispose();
-            openHalamanUtamaView();
-        });
     }
 
-        public void showKategoriSampah() {
-            if (kategoriSampahView != null) {
-                kategoriSampahView.dispose();
-            }
-            kategoriSampahView = new KategoriSampahView();
-
-            // Menambahkan listener untuk tombol kembali
-            kategoriSampahView.addBackButtonListener(e -> {
-                kategoriSampahView.dispose();
-                openHalamanUtamaView();
-            });
-
-            kategoriSampahView.setVisible(true);
+    public void showKategoriSampah() {
+        if (kategoriSampahView != null) {
+            kategoriSampahView.dispose();
         }
+        SqlSessionFactory factory = MyBatisUtil.getSqlSessionFactory();
+        KategoriSampahController kategoriController = new KategoriSampahController(factory);
+        kategoriController.showKategoriSampah();
+    }
 
-        public void showJenisSampah() {
-            if (jenisSampahView != null) {
-                jenisSampahView.dispose();
-            }
-            jenisSampahView = new JenisSampahView();
-
-            // Menambahkan listener untuk tombol kembali
-            jenisSampahView.addBackButtonListener(e -> {
-                jenisSampahView.dispose();
-                openHalamanUtamaView();
-            });
-
-            jenisSampahView.setVisible(true);
+    public void showJenisSampah() {
+        if (jenisSampahView != null) {
+            jenisSampahView.dispose();
         }
+        SqlSessionFactory factory = MyBatisUtil.getSqlSessionFactory();
+        JenisSampahController jenisController = new JenisSampahController(factory);
+        jenisController.showJenisSampah();
+    }
 
     private void handleForgotPassword() {
             String email = forgotPasswordView.getEmail();
@@ -699,7 +670,6 @@
             return;
         }
 
-        // Show confirmation dialog
         int confirm = JOptionPane.showConfirmDialog(
                 userProfileView,
                 "Are you sure you want to delete your account? This action cannot be undone.",
@@ -714,16 +684,9 @@
                 SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
                 OTPVerificationMapper otpMapper = session.getMapper(OTPVerificationMapper.class);
 
-                // Get user email before deletion
                 String userEmail = loggedInUser.getEmail();
-
-                // Deactivate all sessions
                 sessionMapper.deactivateUserSessions(loggedInUser.getId());
-
-                // Delete OTP verifications
                 otpMapper.deleteByEmail(userEmail);
-
-                // Delete the user
                 int result = mapper.deleteUser(loggedInUser.getId());
 
                 if (result > 0) {
@@ -733,7 +696,7 @@
 
                     userProfileView.showMessage("Account successfully deleted!");
                     userProfileView.dispose();
-                    openHalamanUtamaView();
+                    showHalamanAwal();
                 } else {
                     session.rollback();
                     userProfileView.showMessage("Failed to delete account!");
@@ -744,5 +707,4 @@
             }
         }
     }
-
-    }
+}

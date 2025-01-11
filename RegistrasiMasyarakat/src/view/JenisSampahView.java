@@ -1,188 +1,105 @@
 package view;
 
+import model.JenisModel;
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumnModel;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import model.JenisModel;
-import model.JenisMapper;
-import org.apache.ibatis.session.SqlSession;
-import util.MyBatisUtil;
 import java.util.List;
 
 public class JenisSampahView extends JFrame {
     private JButton btnKembali;
-    private JTable tblJenisSampah;
-    private DefaultTableModel tableModel;
-    private List<JenisModel> jenisList;
+    private JPanel buttonPanel;
 
-    public JenisSampahView() {
-        initializeComponents();
-        loadJenisSampah();
-    }
-
-    private void initializeComponents() {
+    public JenisSampahView(List<JenisModel> jenisList) {
+        // Setup frame
         setTitle("Jenis Sampah");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(800, 600);
+        setSize(420, 660);
         setLocationRelativeTo(null);
-        setResizable(true);
+        setResizable(false);
 
         // Main Panel
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBackground(new Color(245, 245, 245));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBackground(new Color(230, 230, 230));
 
         // Header Panel
-        JPanel headerPanel = createHeaderPanel();
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBackground(new Color(230, 230, 230));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Table Panel
-        JPanel tablePanel = createTablePanel();
-        mainPanel.add(tablePanel, BorderLayout.CENTER);
-
-        add(mainPanel);
-    }
-
-    private JPanel createHeaderPanel() {
-        JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(245, 245, 245));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
-
-        // Back Button
         btnKembali = new JButton("← Kembali");
         btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnKembali.setForeground(new Color(70, 130, 180));
+        btnKembali.setForeground(new Color(1, 88, 88));
         btnKembali.setBorderPainted(false);
         btnKembali.setContentAreaFilled(false);
         btnKembali.setFocusPainted(false);
         headerPanel.add(btnKembali, BorderLayout.WEST);
 
-        // Title
-        JLabel lblTitle = new JLabel("Daftar Jenis Sampah", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
+        // Title Panel
+        JPanel titlePanel = new JPanel();
+        titlePanel.setLayout(new BorderLayout());
+        titlePanel.setBackground(new Color(230, 230, 230));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+
+        JLabel lblTitle = new JLabel("Jenis Sampah", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
         lblTitle.setForeground(new Color(51, 51, 51));
-        headerPanel.add(lblTitle, BorderLayout.CENTER);
+        titlePanel.add(lblTitle, BorderLayout.CENTER);
 
-        return headerPanel;
-    }
+        // Button Panel
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Use BoxLayout
+        buttonPanel.setBackground(new Color(230, 230, 230));
+        buttonPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
-    private JPanel createTablePanel() {
-        JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBackground(new Color(245, 245, 245));
-
-        // Initialize table model
-        String[] columnNames = {"ID", "Nama Jenis", "Kategori"};
-        tableModel = new DefaultTableModel(columnNames, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
-            }
-        };
-
-        // Initialize table
-        tblJenisSampah = new JTable(tableModel);
-        customizeTable();
-
-        // Add table to scroll pane
-        JScrollPane scrollPane = new JScrollPane(tblJenisSampah);
-        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
-        tablePanel.add(scrollPane, BorderLayout.CENTER);
-
-        return tablePanel;
-    }
-
-    private void customizeTable() {
-        // Set table appearance
-        tblJenisSampah.setRowHeight(30);
-        tblJenisSampah.setFont(new Font("Arial", Font.PLAIN, 12));
-        tblJenisSampah.setGridColor(new Color(230, 230, 230));
-        tblJenisSampah.setSelectionBackground(new Color(70, 130, 180));
-        tblJenisSampah.setSelectionForeground(Color.WHITE);
-        tblJenisSampah.setShowVerticalLines(true);
-        tblJenisSampah.setShowHorizontalLines(true);
-
-        // Customize header
-        tblJenisSampah.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
-        tblJenisSampah.getTableHeader().setBackground(new Color(70, 130, 180));
-        tblJenisSampah.getTableHeader().setForeground(Color.WHITE);
-        tblJenisSampah.getTableHeader().setReorderingAllowed(false);
-
-        // Set column widths
-        TableColumnModel columnModel = tblJenisSampah.getColumnModel();
-        columnModel.getColumn(0).setPreferredWidth(50);  // ID column
-        columnModel.getColumn(1).setPreferredWidth(200); // Nama Jenis column
-        columnModel.getColumn(2).setPreferredWidth(150); // Kategori column
-
-        // Center align for ID column
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        columnModel.getColumn(0).setCellRenderer(centerRenderer);
-    }
-
-    private void loadJenisSampah() {
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            JenisMapper mapper = session.getMapper(JenisMapper.class);
-            jenisList = mapper.getAllJenis();
-
-            // Clear existing table data
-            tableModel.setRowCount(0);
-
-            // Add data to table
+        // Add Buttons to Button Panel
+        if (jenisList != null && !jenisList.isEmpty()) {
             for (JenisModel jenis : jenisList) {
-                Object[] rowData = {
-                        jenis.getId(),
-                        jenis.getNamaJenis(),
-                        jenis.getNamaKategori()
-                };
-                tableModel.addRow(rowData);
+                JButton button = createStyledButton(jenis.getNamaJenis());
+                button.setAlignmentX(Component.CENTER_ALIGNMENT); // Center alignment
+                buttonPanel.add(button);
+                buttonPanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Error loading data: " + e.getMessage());
+        } else {
+            JLabel noDataLabel = new JLabel("Tidak Ada Jenis Sampah", SwingConstants.CENTER);
+            noDataLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            noDataLabel.setForeground(new Color(100, 100, 100));
+            noDataLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center alignment
+            buttonPanel.add(noDataLabel);
         }
+
+        // Add Scroll Pane
+        JScrollPane scrollPane = new JScrollPane(buttonPanel);
+        scrollPane.setBorder(null); // Remove border for cleaner look
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+        // Add panels to main panel
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(titlePanel, BorderLayout.CENTER);
+        mainPanel.add(scrollPane, BorderLayout.SOUTH);
+
+        // Add main panel to frame
+        add(mainPanel);
     }
 
-    public void refresh() {
-        loadJenisSampah();
-    }
-
-    private void showError(String message) {
-        SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    message,
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        });
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(300, 45));
+        button.setMaximumSize(new Dimension(300, 45)); // Ensure consistent size
+        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setBackground(new Color(1, 88, 88));
+        button.setForeground(Color.WHITE);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        return button;
     }
 
     public void addBackButtonListener(ActionListener listener) {
         btnKembali.addActionListener(listener);
-    }
-
-    // Method to get selected jenis if needed
-    public JenisModel getSelectedJenis() {
-        int selectedRow = tblJenisSampah.getSelectedRow();
-        if (selectedRow >= 0 && selectedRow < jenisList.size()) {
-            return jenisList.get(selectedRow);
-        }
-        return null;
-    }
-
-    public static void main(String[] args) {
-        try {
-            // Set System Look and Feel
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            JenisSampahView view = new JenisSampahView();
-            view.setVisible(true);
-        });
     }
 }

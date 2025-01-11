@@ -60,12 +60,13 @@ public class ForgotPasswordView extends JFrame {
         btnSendCode.setForeground(Color.WHITE);
         btnSendCode.setBorderPainted(false);
         btnSendCode.setFocusPainted(false);
-        
+
         btnBackToLogin = new JButton("Back to Login");
-        btnBackToLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        btnBackToLogin.setBackground(new Color(1, 88, 88)); // Warna tombol
-        btnBackToLogin.setForeground(Color.WHITE);
+        btnBackToLogin.setFont(new Font("Arial", Font.PLAIN, 12));
+        btnBackToLogin.setForeground(new Color(70, 130, 180));
+        btnBackToLogin.setForeground(new Color(1, 88, 88));
         btnBackToLogin.setBorderPainted(false);
+        btnBackToLogin.setContentAreaFilled(false);
         btnBackToLogin.setFocusPainted(false);
         // Add components
         gbc.gridx = 0; gbc.gridy = 0;
