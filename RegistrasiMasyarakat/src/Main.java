@@ -1,20 +1,25 @@
 import controller.UserController;
 import model.UserModel;
-import view.HalamanUtamaView;
+import view.HalamanAwalView;
+
 import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            // Create instances of model and HalamanUtamaView
             UserModel userModel = new UserModel();
-            HalamanUtamaView halamanUtamaView = new HalamanUtamaView();
+            HalamanAwalView halamanAwalView = new HalamanAwalView();
 
-            // Create controller
-            UserController controller = new UserController(userModel, halamanUtamaView);
+            // Perbaiki inisialisasi UserController
+            UserController controller = new UserController(userModel, halamanAwalView);
 
-            // Start by showing HalamanUtama
-            halamanUtamaView.setVisible(true);
+            // Tampilkan Halaman Awal
+            controller.showHalamanAwal();
         });
     }
 }
+
+
+
+
+

@@ -7,6 +7,7 @@
     import java.nio.file.Paths;
     import java.nio.file.StandardCopyOption;
     import model.*;
+    import org.apache.ibatis.session.SqlSessionFactory;
     import util.MyBatisUtil;
     import view.*;
     import util.*;
@@ -14,12 +15,11 @@
     import javax.mail.MessagingException;
     import javax.swing.*;
     import java.sql.Timestamp;
-    import java.awt.event.ActionEvent;
-    import java.awt.event.ActionListener;
     import util.UtilityHelper;
 
     public class UserController {
         private UserModel model;
+        private HalamanAwalView halamanAwalView;
         private LoginView loginView;
         private RegisterView registerView;
         private KategoriSampahView kategoriSampahView;
@@ -64,12 +64,13 @@
             return true; // Semua validasi berhasil
         }
 
-        public UserController(UserModel userModel, HalamanUtamaView halamanUtamaView) {
+        public UserController(UserModel userModel, HalamanAwalView halamanAwalView) {
             this.model = userModel;
+            this.halamanAwalView = halamanAwalView;
             this.loginView = new LoginView();
             this.registerView = new RegisterView();
             this.forgotPasswordView = new ForgotPasswordView();
-            this.halamanUtamaView = halamanUtamaView;
+            this.halamanUtamaView = new HalamanUtamaView();
 
             this.loginView.addLoginListener(e -> login());
             this.loginView.addRegisterNavigationListener(e -> showRegister());
@@ -82,6 +83,24 @@
             this.forgotPasswordView.addBackToLoginListener(e -> showLogin());
 
             setupHalamanUtamaListeners();
+            setupHalamanAwalListeners();
+        }
+
+        public void showHalamanAwal() {
+            halamanAwalView.setVisible(true);
+            loginView.setVisible(false);
+            registerView.setVisible(false);
+        }
+        private void setupHalamanAwalListeners() {
+            halamanAwalView.addLoginButtonListener(e -> {
+                halamanAwalView.setVisible(false);
+                showLogin();
+            });
+
+            halamanAwalView.addRegisterButtonListener(e -> {
+                halamanAwalView.setVisible(false);
+                showRegister();
+            });
         }
 
         private void setupHalamanUtamaListeners() {
@@ -115,44 +134,56 @@
                 loggedInUser = null;
                 halamanUtamaView.showMessage("Logout berhasil!");
             });
+        }
 
+        private void login() {
+            String username = loginView.getUsername();
+            String password = loginView.getPassword();
+            String hashedPassword = UtilityHelper.hashPassword(password);
 
+            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                UserMapper userMapper = session.getMapper(UserMapper.class);
+                SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
+
+                // Periksa username dan password
+                UserModel user = userMapper.findByUsernameAndPassword(username, hashedPassword);
+
+                if (user != null) {
+                    // Generate token sesi
+                    String token = JWTUtil.generateToken(user.getId());
+                    Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + SESSION_EXPIRY_TIME);
+
+                    // Simpan sesi
+                    sessionMapper.insert(user.getId(), token, expiresAt);
+                    session.commit();
+
+                    // Set user yang sedang login
+                    this.loggedInUser = user;
+                    SessionManager.getInstance().setToken(token);
+
+                    loginView.showMessage("Login berhasil!");
+
+                    // Arahkan ke halaman berdasarkan role
+                    if (user.getRoleId() == 1) { // Misal role_id = 1 untuk admin
+                        openHalamanDashboardAdmin();
+                    } else {
+                        openHalamanUtamaView();
+                    }
+                } else {
+                    loginView.showMessage("Username atau password salah!");
+                }
+            } catch (Exception ex) {
+                loginView.showMessage("Error: " + ex.getMessage());
+            }
         }
 
 
-        private void login() {
-                String username = loginView.getUsername();
-                String password = loginView.getPassword();
-                String hashedPassword = UtilityHelper.hashPassword(password);
+        public void openHalamanDashboardAdmin() {
+            SqlSessionFactory factory = MyBatisUtil.getSqlSessionFactory();
+            DashboardController dashboardController = new DashboardController(factory);
+            dashboardController.showDashboard();
+        }
 
-                try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                    UserMapper userMapper = session.getMapper(UserMapper.class);
-                    SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
-
-                    UserModel user = userMapper.findByUsernameAndPassword(username, hashedPassword);
-
-                    if (user != null) {
-                        // Generate session token
-                        String token = JWTUtil.generateToken(user.getId());
-                        Timestamp expiresAt = new Timestamp(System.currentTimeMillis() + SESSION_EXPIRY_TIME);
-
-                        // Save session
-                        sessionMapper.insert(user.getId(), token, expiresAt);
-                        session.commit();
-
-                        // Set logged in user and save token
-                        this.loggedInUser = user;
-                        SessionManager.getInstance().setToken(token);
-
-                        loginView.showMessage("Login berhasil!");
-                        openHalamanUtamaView();
-                    } else {
-                        loginView.showMessage("Username atau password salah!");
-                    }
-                } catch (Exception ex) {
-                    loginView.showMessage("Error: " + ex.getMessage());
-                }
-            }
 
         private void register() {
             String username = registerView.getUsername();
@@ -271,10 +302,6 @@
         otpDialog.setVisible(true);
     }
 
-    public void start() {
-        halamanUtamaView.setVisible(true);
-    }
-
     private void showForgotPassword() {
         loginView.setVisible(false);
         forgotPasswordView.setVisible(true);
@@ -287,6 +314,7 @@
         // Listener untuk tombol kembali
         loginView.addBackButtonListener(e -> {
             loginView.setVisible(false);
+            loginView.dispose();
             openHalamanUtamaView();
         });
     }
@@ -298,16 +326,9 @@
         // Listener untuk tombol kembali
         registerView.addBackButtonListener(e -> {
             registerView.setVisible(false);
+            registerView.dispose();
             openHalamanUtamaView();
         });
-    }
-
-    public void navigateToHalamanUtama() {
-        new HalamanUtamaView().setVisible(true);
-    }
-
-    public void navigateToJenisSampah() {
-        new JenisSampahView().setVisible(true);
     }
 
         public void showKategoriSampah() {
@@ -465,257 +486,263 @@
 
         userProfileView.addDeleteAccountListener(e -> handleAccountDeletion());
     }
-        private void updateProfile() {
-            // Validasi input
-            if (!validateProfileInput()) {
-                return;
-            }
-            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                UserMapper mapper = session.getMapper(UserMapper.class);
 
-                // Cek apakah username baru sudah digunakan (jika username diubah)
-                String newUsername = userProfileView.getUsername();
-                if (!newUsername.equals(loggedInUser.getUsername())) {
-                    UserModel existingUser = mapper.findByUsername(newUsername);
-                    if (existingUser != null) {
-                        userProfileView.showMessage("Username sudah digunakan!");
-                        return;
-                    }
-                }
-
-                // Cek apakah email baru sudah digunakan (jika email diubah)
-                String newEmail = userProfileView.getEmail();
-                if (!newEmail.equals(loggedInUser.getEmail())) {
-                    UserModel existingUser = mapper.findByEmail(newEmail);
-                    if (existingUser != null) {
-                        userProfileView.showMessage("Email sudah terdaftar!");
-                        return;
-                    }
-                }
-
-                int result = mapper.updateProfile(
-                    loggedInUser.getId(),
-                    newUsername,
-                    newEmail,
-                    loggedInUser.getPhotoPath(), // Gunakan photo path yang ada di model
-                    userProfileView.getAddress(),
-                    userProfileView.getPhoneNumber()
-                );
-
-                session.commit();
-
-                if (result > 0) {
-                    // Update model dengan data baru
-                    loggedInUser.setUsername(newUsername);
-                    loggedInUser.setEmail(newEmail);
-                    loggedInUser.setAddress(userProfileView.getAddress());
-                    loggedInUser.setPhoneNumber(userProfileView.getPhoneNumber());
-
-                    userProfileView.showMessage("Profil berhasil diperbarui!");
-                } else {
-                    userProfileView.showMessage("Gagal memperbarui profil!");
-                }
-            } catch (Exception ex) {
-                userProfileView.showMessage("Error: " + ex.getMessage());
-                ex.printStackTrace();
-            }
+    private void updateProfile() {
+        // Validasi input
+        if (!validateProfileInput()) {
+            return;
         }
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            UserMapper mapper = session.getMapper(UserMapper.class);
 
-        private boolean validateProfileInput() {
-            String username = userProfileView.getUsername();
-            String email = userProfileView.getEmail();
-            String address = userProfileView.getAddress();
-            String phoneNumber = userProfileView.getPhoneNumber();
-
-            if (username.trim().isEmpty() || email.trim().isEmpty() || 
-                address.trim().isEmpty() || phoneNumber.trim().isEmpty()) {
-                userProfileView.showMessage("Semua field harus diisi!");
-                return false;
-            }
-
-            if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
-                userProfileView.showMessage("Format email tidak valid!");
-                return false;
-            }
-
-            if (!phoneNumber.matches("^[0-9]{10,13}$")) {
-                userProfileView.showMessage("Nomor telepon harus 10-13 digit angka!");
-                return false;
-            }
-
-            return true;
-        }
-
-        private void createUploadDirectoryIfNotExists() {
-            File directory = new File(UPLOAD_DIRECTORY);
-            if (!directory.exists()) {
-                if (!directory.mkdirs()) {
-                    System.err.println("Gagal membuat direktori upload!");
-                }
-            }
-        }
-
-        private void handlePhotoUpload() {
-            String sourcePhotoPath = userProfileView.getSelectedPhotoPath();
-            if (sourcePhotoPath == null || sourcePhotoPath.isEmpty()) {
-                return;
-            }
-
-            // Validasi file
-            File sourceFile = new File(sourcePhotoPath);
-            if (!validatePhotoFile(sourceFile)) {
-                return;
-            }
-
-            try {
-                createUploadDirectoryIfNotExists();
-
-                String fileExtension = sourcePhotoPath.substring(sourcePhotoPath.lastIndexOf(".")).toLowerCase();
-                String newFileName = loggedInUser.getId() + "_" + System.currentTimeMillis() + fileExtension;
-                Path destinationPath = Paths.get(UPLOAD_DIRECTORY, newFileName);
-
-                // Hapus foto lama jika ada
-                deleteOldPhoto();
-
-                // Salin file baru
-                Files.copy(sourceFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
-
-                // Update database
-                updatePhotoPath(UPLOAD_DIRECTORY + "/" + newFileName);
-
-            } catch (IOException e) {
-                userProfileView.showMessage("Error saat mengupload foto: " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
-
-        private boolean validatePhotoFile(File file) {
-            // Validasi ukuran
-            if (file.length() > MAX_FILE_SIZE) {
-                userProfileView.showMessage("Ukuran file terlalu besar! Maksimal 5MB");
-                return false;
-            }
-
-            // Validasi ekstensi
-            String fileName = file.getName().toLowerCase();
-            if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") && 
-                !fileName.endsWith(".png") && !fileName.endsWith(".gif")) {
-                userProfileView.showMessage("Format file tidak didukung! Gunakan JPG, JPEG, PNG, atau GIF");
-                return false;
-            }
-
-            return true;
-        }
-
-        private void deleteOldPhoto() {
-            if (loggedInUser.getPhotoPath() != null && !loggedInUser.getPhotoPath().isEmpty()) {
-                try {
-                    File oldPhoto = new File(loggedInUser.getPhotoPath());
-                    if (oldPhoto.exists()) {
-                        Files.delete(oldPhoto.toPath());
-                    }
-                } catch (IOException e) {
-                    System.err.println("Gagal menghapus foto lama: " + e.getMessage());
-                }
-            }
-        }
-
-        private void updatePhotoPath(String newPhotoPath) {
-            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                UserMapper mapper = session.getMapper(UserMapper.class);
-                int result = mapper.updatePhotoPath(loggedInUser.getId(), newPhotoPath);
-                session.commit();
-
-                if (result > 0) {
-                    loggedInUser.setPhotoPath(newPhotoPath);
-                    userProfileView.showMessage("Foto berhasil diupload!");
-                } else {
-                    userProfileView.showMessage("Gagal mengupdate foto di database!");
-                }
-            } catch (Exception ex) {
-                userProfileView.showMessage("Error: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-        }
-
-
-        // rubah password
-        private void handlePasswordChange(String currentPassword, String newPassword) {
-            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                UserMapper mapper = session.getMapper(UserMapper.class);
-
-                // Verifikasi password lama
-                String hashedCurrentPassword = UtilityHelper.hashPassword(currentPassword);
-                UserModel user = mapper.findByUsernameAndPassword(loggedInUser.getUsername(), hashedCurrentPassword);
-
-                if (user == null) {
-                    userProfileView.showMessage("Current password is incorrect!");
+            // Cek apakah username baru sudah digunakan (jika username diubah)
+            String newUsername = userProfileView.getUsername();
+            if (!newUsername.equals(loggedInUser.getUsername())) {
+                UserModel existingUser = mapper.findByUsername(newUsername);
+                if (existingUser != null) {
+                    userProfileView.showMessage("Username sudah digunakan!");
                     return;
                 }
-
-                // Update password baru
-                String hashedNewPassword = UtilityHelper.hashPassword(newPassword);
-                int result = mapper.updatePassword(user.getEmail(), hashedNewPassword);
-                session.commit();
-
-                if (result > 0) {
-                    userProfileView.showMessage("Password successfully updated!");
-                } else {
-                    userProfileView.showMessage("Failed to update password!");
-                }
-            } catch (Exception ex) {
-                userProfileView.showMessage("Error: " + ex.getMessage());
             }
+
+            // Cek apakah email baru sudah digunakan (jika email diubah)
+            String newEmail = userProfileView.getEmail();
+            if (!newEmail.equals(loggedInUser.getEmail())) {
+                UserModel existingUser = mapper.findByEmail(newEmail);
+                if (existingUser != null) {
+                    userProfileView.showMessage("Email sudah terdaftar!");
+                    return;
+                }
+            }
+
+            int result = mapper.updateProfile(
+                loggedInUser.getId(),
+                newUsername,
+                newEmail,
+                loggedInUser.getPhotoPath(),
+                userProfileView.getAddress(),
+                userProfileView.getPhoneNumber(),
+                    userProfileView.getRoleId()
+            );
+
+            session.commit();
+
+            if (result > 0) {
+                // Update model dengan data baru
+                loggedInUser.setUsername(newUsername);
+                loggedInUser.setEmail(newEmail);
+                loggedInUser.setAddress(userProfileView.getAddress());
+                loggedInUser.setPhoneNumber(userProfileView.getPhoneNumber());
+
+                userProfileView.showMessage("Profil berhasil diperbarui!");
+            } else {
+                userProfileView.showMessage("Gagal memperbarui profil!");
+            }
+        } catch (Exception ex) {
+            userProfileView.showMessage("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
+    private boolean validateProfileInput() {
+        String username = userProfileView.getUsername();
+        String email = userProfileView.getEmail();
+        String address = userProfileView.getAddress();
+        String phoneNumber = userProfileView.getPhoneNumber();
+
+        if (username.trim().isEmpty() || email.trim().isEmpty() ||
+            address.trim().isEmpty() || phoneNumber.trim().isEmpty()) {
+            userProfileView.showMessage("Semua field harus diisi!");
+            return false;
         }
 
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            userProfileView.showMessage("Format email tidak valid!");
+            return false;
+        }
+
+        if (!phoneNumber.matches("^[0-9]{10,13}$")) {
+            userProfileView.showMessage("Nomor telepon harus 10-13 digit angka!");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void createUploadDirectoryIfNotExists() {
+        File directory = new File(UPLOAD_DIRECTORY);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                System.err.println("Gagal membuat direktori upload!");
+            }
+        }
+    }
+
+    private void handlePhotoUpload() {
+        String sourcePhotoPath = userProfileView.getSelectedPhotoPath();
+        if (sourcePhotoPath == null || sourcePhotoPath.isEmpty()) {
+            return;
+        }
+
+        // Validasi file
+        File sourceFile = new File(sourcePhotoPath);
+        if (!validatePhotoFile(sourceFile)) {
+            return;
+        }
+
+        try {
+            createUploadDirectoryIfNotExists();
+
+            String fileExtension = sourcePhotoPath.substring(sourcePhotoPath.lastIndexOf(".")).toLowerCase();
+            String newFileName = loggedInUser.getId() + "_" + System.currentTimeMillis() + fileExtension;
+            Path destinationPath = Paths.get(UPLOAD_DIRECTORY, newFileName);
+
+            // Hapus foto lama jika ada
+            deleteOldPhoto();
+
+            // Salin file baru
+            Files.copy(sourceFile.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            // Update database
+            updatePhotoPath(UPLOAD_DIRECTORY + "/" + newFileName);
+
+        } catch (IOException e) {
+            userProfileView.showMessage("Error saat mengupload foto: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private boolean validatePhotoFile(File file) {
+        // Validasi ukuran
+        if (file.length() > MAX_FILE_SIZE) {
+            userProfileView.showMessage("Ukuran file terlalu besar! Maksimal 5MB");
+            return false;
+        }
+
+        // Validasi ekstensi
+        String fileName = file.getName().toLowerCase();
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg") &&
+            !fileName.endsWith(".png") && !fileName.endsWith(".gif")) {
+            userProfileView.showMessage("Format file tidak didukung! Gunakan JPG, JPEG, PNG, atau GIF");
+            return false;
+        }
+        return true;
+    }
+
+    private void deleteOldPhoto() {
+        if (loggedInUser.getPhotoPath() != null && !loggedInUser.getPhotoPath().isEmpty()) {
+            try {
+                File oldPhoto = new File(loggedInUser.getPhotoPath());
+                if (oldPhoto.exists()) {
+                    Files.delete(oldPhoto.toPath());
+                }
+            } catch (IOException e) {
+                System.err.println("Gagal menghapus foto lama: " + e.getMessage());
+            }
+        }
+    }
+
+    private void updatePhotoPath(String newPhotoPath) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            UserMapper mapper = session.getMapper(UserMapper.class);
+            int result = mapper.updatePhotoPath(loggedInUser.getId(), newPhotoPath);
+            session.commit();
+
+            if (result > 0) {
+                loggedInUser.setPhotoPath(newPhotoPath);
+                userProfileView.showMessage("Foto berhasil diupload!");
+            } else {
+                userProfileView.showMessage("Gagal mengupdate foto di database!");
+            }
+        } catch (Exception ex) {
+            userProfileView.showMessage("Error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
 
 
-        //hapus akun
-        private void handleAccountDeletion() {
-            if (loggedInUser == null) {
-                userProfileView.showMessage("No user logged in!");
+    // rubah password
+    private void handlePasswordChange(String currentPassword, String newPassword) {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            UserMapper mapper = session.getMapper(UserMapper.class);
+
+            // Verifikasi password lama
+            String hashedCurrentPassword = UtilityHelper.hashPassword(currentPassword);
+            UserModel user = mapper.findByUsernameAndPassword(loggedInUser.getUsername(), hashedCurrentPassword);
+
+            if (user == null) {
+                userProfileView.showMessage("Current password is incorrect!");
                 return;
             }
 
-            // Show confirmation dialog
-            int confirm = JOptionPane.showConfirmDialog(
-                    userProfileView,
-                    "Are you sure you want to delete your account? This action cannot be undone.",
-                    "Confirm Account Deletion",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.WARNING_MESSAGE
-            );
+            // Update password baru
+            String hashedNewPassword = UtilityHelper.hashPassword(newPassword);
+            int result = mapper.updatePassword(user.getEmail(), hashedNewPassword);
+            session.commit();
 
-            if (confirm == JOptionPane.YES_OPTION) {
-                try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-                    UserMapper mapper = session.getMapper(UserMapper.class);
-                    SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
+            if (result > 0) {
+                userProfileView.showMessage("Password successfully updated!");
+            } else {
+                userProfileView.showMessage("Failed to update password!");
+            }
+        } catch (Exception ex) {
+            userProfileView.showMessage("Error: " + ex.getMessage());
+        }
+    }
 
-                    // First deactivate all sessions
-                    sessionMapper.deactivateUserSessions(loggedInUser.getId());
 
-                    // Then delete the user
-                    int result = mapper.deleteUser(loggedInUser.getId());
 
-                    if (result > 0) {
-                        session.commit();
+    //hapus akun
+    private void handleAccountDeletion() {
+        if (loggedInUser == null) {
+            userProfileView.showMessage("No user logged in!");
+            return;
+        }
 
-                        // Clear session
-                        SessionManager.getInstance().clearSession();
-                        loggedInUser = null;
+        // Show confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+                userProfileView,
+                "Are you sure you want to delete your account? This action cannot be undone.",
+                "Confirm Account Deletion",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
 
-                        userProfileView.showMessage("Account successfully deleted!");
-                        userProfileView.dispose();
-                        openHalamanUtamaView();
-                    } else {
-                        session.rollback();
-                        userProfileView.showMessage("Failed to delete account!");
-                    }
-                } catch (Exception ex) {
-                    userProfileView.showMessage("Error deleting account: " + ex.getMessage());
-                    ex.printStackTrace();
+        if (confirm == JOptionPane.YES_OPTION) {
+            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                UserMapper mapper = session.getMapper(UserMapper.class);
+                SessionMapper sessionMapper = session.getMapper(SessionMapper.class);
+                OTPVerificationMapper otpMapper = session.getMapper(OTPVerificationMapper.class);
+
+                // Get user email before deletion
+                String userEmail = loggedInUser.getEmail();
+
+                // Deactivate all sessions
+                sessionMapper.deactivateUserSessions(loggedInUser.getId());
+
+                // Delete OTP verifications
+                otpMapper.deleteByEmail(userEmail);
+
+                // Delete the user
+                int result = mapper.deleteUser(loggedInUser.getId());
+
+                if (result > 0) {
+                    session.commit();
+                    SessionManager.getInstance().clearSession();
+                    loggedInUser = null;
+
+                    userProfileView.showMessage("Account successfully deleted!");
+                    userProfileView.dispose();
+                    openHalamanUtamaView();
+                } else {
+                    session.rollback();
+                    userProfileView.showMessage("Failed to delete account!");
                 }
+            } catch (Exception ex) {
+                userProfileView.showMessage("Error deleting account: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
+    }
 
     }
