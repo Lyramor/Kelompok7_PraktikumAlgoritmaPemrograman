@@ -21,12 +21,12 @@ public class ForgotPasswordView extends JFrame {
         // Main Panel
         mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang utama
         
         // Content Panel
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
-        contentPanel.setBackground(new Color(245, 245, 245));
+        contentPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk konten
         contentPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -36,7 +36,7 @@ public class ForgotPasswordView extends JFrame {
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk judul
         titlePanel.setBorder(new EmptyBorder(50, 0, 30, 0));
         
         // Title Label
@@ -56,14 +56,14 @@ public class ForgotPasswordView extends JFrame {
         btnSendCode = new JButton("Send Reset Code");
         btnSendCode.setPreferredSize(new Dimension(300, 45));
         btnSendCode.setFont(new Font("Arial", Font.BOLD, 14));
-        btnSendCode.setBackground(new Color(70, 130, 180));
+        btnSendCode.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnSendCode.setForeground(Color.WHITE);
         btnSendCode.setBorderPainted(false);
         btnSendCode.setFocusPainted(false);
         
         btnBackToLogin = new JButton("Back to Login");
         btnBackToLogin.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnBackToLogin.setForeground(new Color(70, 130, 180));
+        btnBackToLogin.setForeground(new Color(1, 88, 88));
         btnBackToLogin.setBorderPainted(false);
         btnBackToLogin.setContentAreaFilled(false);
         btnBackToLogin.setFocusPainted(false);
