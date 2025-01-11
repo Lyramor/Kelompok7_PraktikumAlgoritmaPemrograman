@@ -1,12 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+import controller.UserController;
+import model.UserModel;
+import view.HalamanAwalView;
 
-/**
- *
- * @author m marsa n j
- */
+import javax.swing.SwingUtilities;
+
 public class Main {
-    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            UserModel userModel = new UserModel();
+            HalamanAwalView halamanAwalView = new HalamanAwalView();
+
+            // Perbaiki inisialisasi UserController
+            UserController controller = new UserController(userModel, halamanAwalView);
+
+            // Tampilkan Halaman Awal
+            controller.showHalamanAwal();
+        });
+    }
 }
+
+
+
+
+
