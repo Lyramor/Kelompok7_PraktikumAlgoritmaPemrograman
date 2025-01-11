@@ -333,6 +333,10 @@ public class UserProfileView extends JFrame {
             }
         });
     }
+
+    public int getRoleId() {
+        return currentUser.getRoleId();
+    }
 }
 
 
