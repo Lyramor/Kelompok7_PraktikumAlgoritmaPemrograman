@@ -21,63 +21,81 @@ public class KategoriSampahView extends JFrame {
 
         // Main Panel
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
+        mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.setBackground(new Color(230, 230, 230));
 
-        // Header Panel
+        // Header Panel for back button
         JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         headerPanel.setBackground(new Color(230, 230, 230));
-        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
+        // Back Button
         btnKembali = new JButton("← Kembali");
         btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
         btnKembali.setForeground(new Color(1, 88, 88));
         btnKembali.setBorderPainted(false);
         btnKembali.setContentAreaFilled(false);
         btnKembali.setFocusPainted(false);
-        headerPanel.add(btnKembali, BorderLayout.WEST);
+        headerPanel.add(btnKembali);
 
         // Title Panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setLayout(new BorderLayout());
+        titlePanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         titlePanel.setBackground(new Color(230, 230, 230));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        titlePanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
 
+        // Title Label
         JLabel lblTitle = new JLabel("Kategori Sampah", SwingConstants.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
         lblTitle.setForeground(new Color(51, 51, 51));
-        titlePanel.add(lblTitle, BorderLayout.CENTER);
+        titlePanel.add(lblTitle);
 
-        // Button Panel
+        // Top Panel to combine header and title
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+        topPanel.setBackground(new Color(230, 230, 230));
+        topPanel.add(headerPanel);
+        topPanel.add(titlePanel);
+
+        // Content Panel for buttons
         buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridBagLayout());
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBackground(new Color(230, 230, 230));
         buttonPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-
+        // Add Buttons to Button Panel
         if (kategoriList != null && !kategoriList.isEmpty()) {
             for (KategoriModel kategori : kategoriList) {
                 JButton button = createStyledButton(kategori.getNamaKategori());
-                buttonPanel.add(button, gbc);
-                gbc.gridy++;
+                button.setAlignmentX(Component.CENTER_ALIGNMENT);
+                buttonPanel.add(button);
+                buttonPanel.add(Box.createRigidArea(new Dimension(0, 10)));
             }
         } else {
             JLabel noDataLabel = new JLabel("Tidak Ada Kategori Sampah", SwingConstants.CENTER);
             noDataLabel.setFont(new Font("Arial", Font.BOLD, 16));
             noDataLabel.setForeground(new Color(100, 100, 100));
-            buttonPanel.add(noDataLabel, gbc);
+            noDataLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            buttonPanel.add(noDataLabel);
         }
 
-        // Add panels to main panel
-        mainPanel.add(headerPanel, BorderLayout.NORTH);
-        mainPanel.add(titlePanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
+        // Create a panel to ensure buttons stay at the top when scrolling
+        JPanel contentWrapper = new JPanel(new BorderLayout());
+        contentWrapper.setBackground(new Color(230, 230, 230));
+        contentWrapper.add(buttonPanel, BorderLayout.NORTH);
+
+        // Scroll Pane
+        JScrollPane scrollPane = new JScrollPane(contentWrapper);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(8, 0));
+        scrollPane.setBackground(new Color(230, 230, 230));
+
+        // Add components to main panel
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         // Add main panel to frame
         add(mainPanel);
@@ -86,6 +104,7 @@ public class KategoriSampahView extends JFrame {
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setPreferredSize(new Dimension(300, 45));
+        button.setMaximumSize(new Dimension(300, 45));
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setBackground(new Color(1, 88, 88));
         button.setForeground(Color.WHITE);

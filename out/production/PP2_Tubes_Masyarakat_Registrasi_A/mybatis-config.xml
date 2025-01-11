@@ -16,6 +16,7 @@
     <mapper class="model.UserMapper"/>
     <mapper class="model.OTPVerificationMapper"/>
     <mapper class="model.SessionMapper"/>
-
+    <mapper class="model.KategoriMapper"/>
+    <mapper class="model.JenisMapper" />
   </mappers>
 </configuration>
