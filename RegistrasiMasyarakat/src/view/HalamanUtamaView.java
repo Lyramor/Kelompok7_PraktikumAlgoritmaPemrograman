@@ -24,12 +24,12 @@ public class HalamanUtamaView extends JFrame {
         // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang utama
 
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS)); // Vertical layout
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk title
         titlePanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
 
         // Add title and subtitle labels
@@ -52,7 +52,7 @@ public class HalamanUtamaView extends JFrame {
         // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        buttonPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk panel tombol
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -62,7 +62,7 @@ public class HalamanUtamaView extends JFrame {
         btnHalamanProfile = new JButton("Halaman Profile");
         btnHalamanProfile.setPreferredSize(new Dimension(300, 45));
         btnHalamanProfile.setFont(new Font("Arial", Font.BOLD, 14));
-        btnHalamanProfile.setBackground(new Color(70, 130, 180));
+        btnHalamanProfile.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnHalamanProfile.setForeground(Color.WHITE);
         btnHalamanProfile.setBorderPainted(false);
         btnHalamanProfile.setFocusPainted(false);
@@ -70,7 +70,7 @@ public class HalamanUtamaView extends JFrame {
         btnKategoriSampah = new JButton("Kategori Sampah");
         btnKategoriSampah.setPreferredSize(new Dimension(300, 45));
         btnKategoriSampah.setFont(new Font("Arial", Font.BOLD, 14));
-        btnKategoriSampah.setBackground(new Color(70, 130, 180));
+        btnKategoriSampah.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnKategoriSampah.setForeground(Color.WHITE);
         btnKategoriSampah.setBorderPainted(false);
         btnKategoriSampah.setFocusPainted(false);
@@ -78,7 +78,7 @@ public class HalamanUtamaView extends JFrame {
         btnJenisSampah = new JButton("Jenis Sampah");
         btnJenisSampah.setPreferredSize(new Dimension(300, 45));
         btnJenisSampah.setFont(new Font("Arial", Font.BOLD, 14));
-        btnJenisSampah.setBackground(new Color(70, 130, 180));
+        btnJenisSampah.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnJenisSampah.setForeground(Color.WHITE);
         btnJenisSampah.setBorderPainted(false);
         btnJenisSampah.setFocusPainted(false);
@@ -101,18 +101,18 @@ public class HalamanUtamaView extends JFrame {
         // Bottom Panel for Login and Logout buttons
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new GridLayout(1, 2));
-        bottomPanel.setBackground(new Color(245, 245, 245));
+        bottomPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk panel bawah
 
         btnLogin = new JButton("Login");
         btnLogin.setFont(new Font("Arial", Font.BOLD, 12));
-        btnLogin.setBackground(new Color(70, 130, 180));
+        btnLogin.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBorderPainted(false);
         btnLogin.setFocusPainted(false);
 
         btnLogout = new JButton("Logout");
         btnLogout.setFont(new Font("Arial", Font.BOLD, 12));
-        btnLogout.setBackground(new Color(70, 130, 180));
+        btnLogout.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnLogout.setForeground(Color.WHITE);
         btnLogout.setBorderPainted(false);
         btnLogout.setFocusPainted(false);

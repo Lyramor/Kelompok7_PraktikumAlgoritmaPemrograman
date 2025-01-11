@@ -34,22 +34,22 @@ public class UserProfileView extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Panel utama
+        // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Background color
 
-        // Panel konten
+        // Content Panel
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new GridBagLayout());
-        contentPanel.setBackground(new Color(245, 245, 245));
+        contentPanel.setBackground(new Color(230, 230, 230)); // Background color for content panel
         contentPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
 
-        // Foto profil
+        // Profile Photo
         lblPhoto = new JLabel();
         lblPhoto.setPreferredSize(new Dimension(150, 150));
         lblPhoto.setBorder(BorderFactory.createLineBorder(Color.GRAY));
@@ -67,19 +67,19 @@ public class UserProfileView extends JFrame {
         btnUpdate = new JButton("Update Profile");
         styleButton(btnUpdate);
 
-        //tombol change pw
+        // Change Password button
         btnChangePassword = new JButton("Change Password");
         styleButton(btnChangePassword);
 
-        //btn back
+        // Back button
         btnBack = new JButton("Back");
         styleButton(btnBack);
 
-        //btn hapus akun
-        btnDeleteAccount = new JButton("Delete Account"); // Tombol untuk hapus akun
-        styleButton(btnDeleteAccount); // Menambahkan gaya tombol
+        // Delete Account button
+        btnDeleteAccount = new JButton("Delete Account"); // Button to delete account
+        styleButton(btnDeleteAccount);
 
-        // Menambahkan komponen
+        // Add components
         gbc.gridx = 0; gbc.gridy = 0;
         gbc.gridwidth = 2;
         contentPanel.add(lblPhoto, gbc);
@@ -122,14 +122,14 @@ public class UserProfileView extends JFrame {
     private void styleButton(JButton button) {
         button.setPreferredSize(new Dimension(300, 40));
         button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(70, 130, 180));
+        button.setBackground(new Color(1, 88, 88)); // Button background color
         button.setForeground(Color.WHITE);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
     }
 
     private void addFormField(JPanel panel, String label, JComponent field,
-                              GridBagConstraints gbc, int gridy) {
+        GridBagConstraints gbc, int gridy) {
         gbc.gridy = gridy;
         gbc.gridwidth = 1;
         panel.add(new JLabel(label), gbc);
@@ -139,22 +139,14 @@ public class UserProfileView extends JFrame {
         panel.add(field, gbc);
     }
 
-    // Setter untuk data user
+    // Setter for user data
     public void setUserData(UserModel user) {
-        System.out.println("DEBUG: Setting user data in UserProfileView:");
-        System.out.println("Username: " + user.getUsername());
-        System.out.println("Email: " + user.getEmail());
-        System.out.println("Photo Path: " + user.getPhotoPath());
-        System.out.println("Address: " + user.getAddress());
-        System.out.println("Phone Number: " + user.getPhoneNumber());
-
-        // Implementasi pengaturan data ke text fields dan label (cek jika null)
         txtUsername.setText(user.getUsername() != null ? user.getUsername() : "");
         txtEmail.setText(user.getEmail() != null ? user.getEmail() : "");
         txtAddress.setText(user.getAddress() != null ? user.getAddress() : "");
         txtPhoneNumber.setText(user.getPhoneNumber() != null ? user.getPhoneNumber() : "No Phone Number");
 
-        // Logika untuk foto pengguna
+        // Logic for user photo
         if (user.getPhotoPath() != null && !user.getPhotoPath().isEmpty()) {
             File photoFile = new File(user.getPhotoPath());
             if (photoFile.exists()) {
@@ -183,7 +175,7 @@ public class UserProfileView extends JFrame {
         }
     }
 
-    // Getters untuk data form
+    // Getters for form data
     public String getUsername() { return txtUsername.getText(); }
     public String getEmail() { return txtEmail.getText(); }
     public String getAddress() { return txtAddress.getText(); }
@@ -212,16 +204,13 @@ public class UserProfileView extends JFrame {
         });
     }
 
-    // Menambahkan listener untuk tombol hapus akun
+    // Add listener for delete account button
     public void addDeleteAccountListener(ActionListener listener) {
         btnDeleteAccount.addActionListener(e -> {
-            // Menampilkan konfirmasi untuk menghapus akun
             int confirm = JOptionPane.showConfirmDialog(this,
                     "Are you sure you want to delete your account?",
                     "Confirm Delete",
                     JOptionPane.YES_NO_OPTION);
-
-            // Jika pengguna memilih "Yes", panggil listener
             if (confirm == JOptionPane.YES_OPTION) {
                 listener.actionPerformed(e);
             }
@@ -232,8 +221,7 @@ public class UserProfileView extends JFrame {
         JOptionPane.showMessageDialog(this, message);
     }
 
-
-    //method rubah pw
+    // Password change logic
     private void showChangePasswordDialog() {
         JDialog dialog = new JDialog(this, "Change Password", true);
         dialog.setSize(350, 350);
@@ -270,31 +258,21 @@ public class UserProfileView extends JFrame {
         gbc.gridy = 5;
         panel.add(txtConfirmPassword, gbc);
 
-        JButton btnSubmit = new JButton("Change Password");
-        styleButton(btnSubmit);
+        JButton btnSave = new JButton("Save Changes");
+        styleButton(btnSave);
         gbc.gridy = 6;
-        gbc.insets = new Insets(15, 5, 5, 5);
-        panel.add(btnSubmit, gbc);
+        panel.add(btnSave, gbc);
 
         dialog.add(panel);
-
-        btnSubmit.addActionListener(e -> {
-            if (validatePasswordChange()) {
-                dialog.dispose();
-            }
-        });
-
         dialog.setVisible(true);
     }
 
     private void stylePasswordField(JPasswordField field) {
-        field.setPreferredSize(new Dimension(300, 35));
         field.setFont(new Font("Arial", Font.PLAIN, 14));
         field.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(204, 204, 204)),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)));
     }
-
     private boolean validatePasswordChange() {
         String currentPass = new String(txtCurrentPassword.getPassword());
         String newPass = new String(txtNewPassword.getPassword());
@@ -338,5 +316,3 @@ public class UserProfileView extends JFrame {
         return currentUser.getRoleId();
     }
 }
-
-

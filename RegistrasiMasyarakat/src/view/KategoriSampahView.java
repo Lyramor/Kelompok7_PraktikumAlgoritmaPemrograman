@@ -18,17 +18,17 @@ public class KategoriSampahView extends JFrame {
         // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang utama
 
         // Back Button Panel
         JPanel backButtonPanel = new JPanel();
         backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(245, 245, 245));
+        backButtonPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang back button
         backButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
 
-        btnKembali = new JButton("← Kembali");
+        btnKembali = new JButton("\u2190 Kembali");
         btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnKembali.setForeground(new Color(70, 130, 180));
+        btnKembali.setForeground(new Color(1, 88, 88)); // Warna teks tombol kembali
         btnKembali.setBorderPainted(false);
         btnKembali.setContentAreaFilled(false);
         btnKembali.setFocusPainted(false);
@@ -38,7 +38,7 @@ public class KategoriSampahView extends JFrame {
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk title
         titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
 
         JLabel lblTitle = new JLabel("Kategori Sampah", SwingConstants.CENTER);
@@ -49,7 +49,7 @@ public class KategoriSampahView extends JFrame {
         // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        buttonPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk panel tombol
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -69,7 +69,7 @@ public class KategoriSampahView extends JFrame {
             btnKategori.setHorizontalAlignment(SwingConstants.LEFT); // Teks rata kiri
             btnKategori.setPreferredSize(new Dimension(300, 45));
             btnKategori.setFont(new Font("Arial", Font.BOLD, 14));
-            btnKategori.setBackground(new Color(70, 130, 180));
+            btnKategori.setBackground(new Color(1, 88, 88)); // Warna tombol
             btnKategori.setForeground(Color.WHITE);
             btnKategori.setBorderPainted(false);
             btnKategori.setFocusPainted(false);
