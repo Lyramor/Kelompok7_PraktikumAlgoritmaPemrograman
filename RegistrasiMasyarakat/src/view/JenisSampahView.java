@@ -1,124 +1,188 @@
 package view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import model.JenisModel;
+import model.JenisMapper;
+import org.apache.ibatis.session.SqlSession;
+import util.MyBatisUtil;
+import java.util.List;
 
 public class JenisSampahView extends JFrame {
-    private JButton btnLogam;
-    private JButton btnPlastik;
-    private JButton btnKaca;
-    private JButton btnKomponenElektronik;
-    private JButton btnBaterai;
     private JButton btnKembali;
+    private JTable tblJenisSampah;
+    private DefaultTableModel tableModel;
+    private List<JenisModel> jenisList;
 
     public JenisSampahView() {
-        // Set up the frame
+        initializeComponents();
+        loadJenisSampah();
+    }
+
+    private void initializeComponents() {
         setTitle("Jenis Sampah");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(420, 660);
+        setSize(800, 600);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
 
         // Main Panel
-        JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(230, 230, 230)); // Sama seperti HalamanAwalView
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Back button panel
-        JPanel backButtonPanel = new JPanel();
-        backButtonPanel.setLayout(new BorderLayout());
-        backButtonPanel.setBackground(new Color(230, 230, 230));
-        backButtonPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 0, 20));
+        // Header Panel
+        JPanel headerPanel = createHeaderPanel();
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
 
-        btnKembali = new JButton("\u2190 Kembali"); // Unicode untuk panah kiri
+        // Table Panel
+        JPanel tablePanel = createTablePanel();
+        mainPanel.add(tablePanel, BorderLayout.CENTER);
+
+        add(mainPanel);
+    }
+
+    private JPanel createHeaderPanel() {
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setBackground(new Color(245, 245, 245));
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
+
+        // Back Button
+        btnKembali = new JButton("← Kembali");
         btnKembali.setFont(new Font("Arial", Font.PLAIN, 12));
-        btnKembali.setForeground(new Color(1, 88, 88)); // Warna teks
+        btnKembali.setForeground(new Color(70, 130, 180));
         btnKembali.setBorderPainted(false);
         btnKembali.setContentAreaFilled(false);
         btnKembali.setFocusPainted(false);
+        headerPanel.add(btnKembali, BorderLayout.WEST);
 
-        backButtonPanel.add(btnKembali, BorderLayout.WEST);
-
-        // Title Panel
-        JPanel titlePanel = new JPanel();
-        titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(230, 230, 230));
-        titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 30, 0));
-
-        JLabel lblTitle = new JLabel("Jenis Sampah", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
+        // Title
+        JLabel lblTitle = new JLabel("Daftar Jenis Sampah", SwingConstants.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
         lblTitle.setForeground(new Color(51, 51, 51));
-        titlePanel.add(lblTitle, BorderLayout.CENTER);
+        headerPanel.add(lblTitle, BorderLayout.CENTER);
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setBackground(new Color(230, 230, 230)); // Sama seperti HalamanAwalView
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        // Buttons
-        btnLogam = createStyledButton("Logam");
-        btnPlastik = createStyledButton("Plastik");
-        btnKaca = createStyledButton("Kaca");
-        btnKomponenElektronik = createStyledButton("Komponen Elektronik");
-        btnBaterai = createStyledButton("Baterai");
-
-        // Add buttons to button panel
-        gbc.gridx = 0;
-
-        gbc.gridy = 0;
-        buttonPanel.add(btnLogam, gbc);
-
-        gbc.gridy = 1;
-        buttonPanel.add(btnPlastik, gbc);
-
-        gbc.gridy = 2;
-        buttonPanel.add(btnKaca, gbc);
-
-        gbc.gridy = 3;
-        buttonPanel.add(btnKomponenElektronik, gbc);
-
-        gbc.gridy = 4;
-        buttonPanel.add(btnBaterai, gbc);
-
-        // Add panels to main panel
-        mainPanel.add(backButtonPanel, BorderLayout.NORTH);
-        mainPanel.add(titlePanel, BorderLayout.CENTER);
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        // Add main panel to frame
-        add(mainPanel);
-
-        // Debugging: Output untuk memastikan frame berhasil diinisialisasi
-        System.out.println("Jenis Sampah View initialized");
+        return headerPanel;
     }
 
-    // Method untuk menambahkan listener tombol kembali
+    private JPanel createTablePanel() {
+        JPanel tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(new Color(245, 245, 245));
+
+        // Initialize table model
+        String[] columnNames = {"ID", "Nama Jenis", "Kategori"};
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table non-editable
+            }
+        };
+
+        // Initialize table
+        tblJenisSampah = new JTable(tableModel);
+        customizeTable();
+
+        // Add table to scroll pane
+        JScrollPane scrollPane = new JScrollPane(tblJenisSampah);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+        return tablePanel;
+    }
+
+    private void customizeTable() {
+        // Set table appearance
+        tblJenisSampah.setRowHeight(30);
+        tblJenisSampah.setFont(new Font("Arial", Font.PLAIN, 12));
+        tblJenisSampah.setGridColor(new Color(230, 230, 230));
+        tblJenisSampah.setSelectionBackground(new Color(70, 130, 180));
+        tblJenisSampah.setSelectionForeground(Color.WHITE);
+        tblJenisSampah.setShowVerticalLines(true);
+        tblJenisSampah.setShowHorizontalLines(true);
+
+        // Customize header
+        tblJenisSampah.getTableHeader().setFont(new Font("Arial", Font.BOLD, 12));
+        tblJenisSampah.getTableHeader().setBackground(new Color(70, 130, 180));
+        tblJenisSampah.getTableHeader().setForeground(Color.WHITE);
+        tblJenisSampah.getTableHeader().setReorderingAllowed(false);
+
+        // Set column widths
+        TableColumnModel columnModel = tblJenisSampah.getColumnModel();
+        columnModel.getColumn(0).setPreferredWidth(50);  // ID column
+        columnModel.getColumn(1).setPreferredWidth(200); // Nama Jenis column
+        columnModel.getColumn(2).setPreferredWidth(150); // Kategori column
+
+        // Center align for ID column
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        columnModel.getColumn(0).setCellRenderer(centerRenderer);
+    }
+
+    private void loadJenisSampah() {
+        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+            JenisMapper mapper = session.getMapper(JenisMapper.class);
+            jenisList = mapper.getAllJenis();
+
+            // Clear existing table data
+            tableModel.setRowCount(0);
+
+            // Add data to table
+            for (JenisModel jenis : jenisList) {
+                Object[] rowData = {
+                        jenis.getId(),
+                        jenis.getNamaJenis(),
+                        jenis.getNamaKategori()
+                };
+                tableModel.addRow(rowData);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Error loading data: " + e.getMessage());
+        }
+    }
+
+    public void refresh() {
+        loadJenisSampah();
+    }
+
+    private void showError(String message) {
+        SwingUtilities.invokeLater(() -> {
+            JOptionPane.showMessageDialog(this,
+                    message,
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        });
+    }
+
     public void addBackButtonListener(ActionListener listener) {
         btnKembali.addActionListener(listener);
     }
 
-    private JButton createStyledButton(String text) {
-        JButton button = new JButton(text);
-        button.setPreferredSize(new Dimension(300, 45));
-        button.setFont(new Font("Arial", Font.BOLD, 14));
-        button.setBackground(new Color(1, 88, 88)); // Warna tombol sama seperti HalamanAwalView
-        button.setForeground(Color.WHITE);
-        button.setHorizontalAlignment(SwingConstants.CENTER);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        return button;
+    // Method to get selected jenis if needed
+    public JenisModel getSelectedJenis() {
+        int selectedRow = tblJenisSampah.getSelectedRow();
+        if (selectedRow >= 0 && selectedRow < jenisList.size()) {
+            return jenisList.get(selectedRow);
+        }
+        return null;
     }
 
     public static void main(String[] args) {
+        try {
+            // Set System Look and Feel
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         SwingUtilities.invokeLater(() -> {
-            JenisSampahView jenisSampahView = new JenisSampahView();
-            jenisSampahView.setVisible(true);
+            JenisSampahView view = new JenisSampahView();
+            view.setVisible(true);
         });
     }
 }
