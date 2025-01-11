@@ -10,7 +10,8 @@ public class HalamanUtamaView extends JFrame {
     private JButton btnJenisSampah;
     private JButton btnLogin;
     private JButton btnLogout;
-    private JLabel lblTitle;
+    private JLabel titleLabel;
+    private JLabel subtitleLabel;
 
     public HalamanUtamaView() {
         // Set up the frame
@@ -27,14 +28,26 @@ public class HalamanUtamaView extends JFrame {
 
         // Title Panel
         JPanel titlePanel = new JPanel();
-        titlePanel.setLayout(new BorderLayout());
+        titlePanel.setLayout(new BoxLayout(titlePanel, BoxLayout.Y_AXIS)); // Vertical layout
         titlePanel.setBackground(new Color(245, 245, 245));
         titlePanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
 
-        lblTitle = new JLabel("E-Waste", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 32));
-        lblTitle.setForeground(new Color(51, 51, 51));
-        titlePanel.add(lblTitle, BorderLayout.CENTER);
+        // Add title and subtitle labels
+        titleLabel = new JLabel("Welcome to eWaste!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(new Color(51, 51, 51));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        subtitleLabel = new JLabel("Recycle. Reward. Repeat.", SwingConstants.CENTER);
+        subtitleLabel.setFont(new Font("Arial", Font.ITALIC, 16));
+        subtitleLabel.setForeground(new Color(100, 100, 100));
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Add labels to title panel
+        titlePanel.add(titleLabel);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 10))); // Add spacing between labels
+        titlePanel.add(subtitleLabel);
+        titlePanel.add(Box.createRigidArea(new Dimension(0, 20))); // Add spacing before main title
 
         // Button Panel
         JPanel buttonPanel = new JPanel();
@@ -144,10 +157,7 @@ public class HalamanUtamaView extends JFrame {
         btnLogout.addActionListener(listener);
     }
 
-
-
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
-
 }

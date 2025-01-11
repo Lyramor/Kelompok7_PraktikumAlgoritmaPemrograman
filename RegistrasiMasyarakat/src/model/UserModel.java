@@ -5,12 +5,13 @@ public class UserModel {
     private String username;
     private String password;
     private String email;
-    private String photoPath; // Cocok dengan alias "photoPath" di query
+    private String photoPath;
     private String address;
-    private String phoneNumber; // Cocok dengan alias "phoneNumber" di query
+    private String phoneNumber;
     private boolean isVerified;
     private String verificationCode;
     private java.sql.Timestamp verificationCodeExpiry;
+    private Integer roleId; // Relasi ke tabel roles
 
     // Constructor
     public UserModel() {
@@ -97,6 +98,14 @@ public class UserModel {
         this.verificationCodeExpiry = verificationCodeExpiry;
     }
 
+    public Integer getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Integer roleId) {
+        this.roleId = roleId;
+    }
+
     @Override
     public String toString() {
         return "UserModel{" +
@@ -104,6 +113,7 @@ public class UserModel {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", isVerified=" + isVerified +
+                ", roleId=" + roleId +
                 '}';
     }
 }

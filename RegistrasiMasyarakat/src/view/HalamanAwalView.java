@@ -20,12 +20,12 @@ public class HalamanAwalView extends JFrame {
         // Main Panel
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBackground(new Color(245, 245, 245));
+        mainPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang utama
 
         // Title Panel
         JPanel titlePanel = new JPanel();
         titlePanel.setLayout(new BorderLayout());
-        titlePanel.setBackground(new Color(245, 245, 245));
+        titlePanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk title
         titlePanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 30, 0));
 
         lblTitle = new JLabel("E-Waste", SwingConstants.CENTER);
@@ -36,7 +36,7 @@ public class HalamanAwalView extends JFrame {
         // Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridBagLayout());
-        buttonPanel.setBackground(new Color(245, 245, 245));
+        buttonPanel.setBackground(new Color(230, 230, 230)); // Warna latar belakang untuk panel tombol
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -46,7 +46,7 @@ public class HalamanAwalView extends JFrame {
         btnLogin = new JButton("Login");
         btnLogin.setPreferredSize(new Dimension(300, 45));
         btnLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        btnLogin.setBackground(new Color(70, 130, 180));
+        btnLogin.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnLogin.setForeground(Color.WHITE);
         btnLogin.setBorderPainted(false);
         btnLogin.setFocusPainted(false);
@@ -54,7 +54,7 @@ public class HalamanAwalView extends JFrame {
         btnRegister = new JButton("Register");
         btnRegister.setPreferredSize(new Dimension(300, 45));
         btnRegister.setFont(new Font("Arial", Font.BOLD, 14));
-        btnRegister.setBackground(new Color(70, 130, 180));
+        btnRegister.setBackground(new Color(1, 88, 88)); // Warna tombol
         btnRegister.setForeground(Color.WHITE);
         btnRegister.setBorderPainted(false);
         btnRegister.setFocusPainted(false);
@@ -87,9 +87,5 @@ public class HalamanAwalView extends JFrame {
     public void addRegisterButtonListener(ActionListener listener) {
         System.out.println("Listener untuk Register ditambahkan");
         btnRegister.addActionListener(listener);
-    }
-
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(this, message);
     }
 }
