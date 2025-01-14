@@ -11,13 +11,10 @@ public class UserModel {
     private boolean isVerified;
     private String verificationCode;
     private java.sql.Timestamp verificationCodeExpiry;
-    private Integer roleId; // Relasi ke tabel roles
+    private Integer roleId;
 
-    // Constructor
-    public UserModel() {
-    }
+    public UserModel() {}
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

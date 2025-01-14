@@ -91,13 +91,14 @@ public interface UserMapper {
     @Update("UPDATE users SET username = #{username}, email = #{email}, " +
             "photo_path = CASE WHEN #{photoPath} IS NOT NULL THEN #{photoPath} ELSE photo_path END, " +
             "address = #{address}, " +
-            "phone_number = CASE WHEN #{phoneNumber} IS NOT NULL THEN #{phoneNumber} ELSE phone_number END, " +
-            "role_id = #{roleId} " +  // Add role_id field to the update query
+            "phone_number = CASE WHEN #{phoneNumber} IS NOT NULL THEN #{phoneNumber} ELSE phone_number END " +
             "WHERE id = #{id}")
-    int updateProfile(@Param("id") int id, @Param("username") String username,
-                      @Param("email") String email, @Param("photoPath") String photoPath,
-                      @Param("address") String address, @Param("phoneNumber") String phoneNumber,
-                      @Param("roleId") int roleId);  // Add roleId to the method parameters
+    int updateProfile(@Param("id") int id,
+                      @Param("username") String username,
+                      @Param("email") String email,
+                      @Param("photoPath") String photoPath,
+                      @Param("address") String address,
+                      @Param("phoneNumber") String phoneNumber);
 
 
     // Perbarui foto pengguna

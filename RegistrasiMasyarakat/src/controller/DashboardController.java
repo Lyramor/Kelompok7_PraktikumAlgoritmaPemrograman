@@ -316,8 +316,7 @@ public class DashboardController {
                             user.getEmail(),
                             user.getPhotoPath(),
                             user.getAddress(),
-                            user.getPhoneNumber(),
-                            user.getRoleId()
+                            user.getPhoneNumber()
                     );
                     session.commit();
                     loadUserData();

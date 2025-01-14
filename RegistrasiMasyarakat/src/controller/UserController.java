@@ -458,62 +458,62 @@
         userProfileView.addDeleteAccountListener(e -> handleAccountDeletion());
     }
 
-    private void updateProfile() {
-        // Validasi input
-        if (!validateProfileInput()) {
-            return;
-        }
-        try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
-            UserMapper mapper = session.getMapper(UserMapper.class);
+        private void updateProfile() {
+            // Validasi input
+            if (!validateProfileInput()) {
+                return;
+            }
+            try (SqlSession session = MyBatisUtil.getSqlSessionFactory().openSession()) {
+                UserMapper mapper = session.getMapper(UserMapper.class);
 
-            // Cek apakah username baru sudah digunakan (jika username diubah)
-            String newUsername = userProfileView.getUsername();
-            if (!newUsername.equals(loggedInUser.getUsername())) {
-                UserModel existingUser = mapper.findByUsername(newUsername);
-                if (existingUser != null) {
-                    userProfileView.showMessage("Username sudah digunakan!");
-                    return;
+                // Cek apakah username baru sudah digunakan (jika username diubah)
+                String newUsername = userProfileView.getUsername();
+                if (!newUsername.equals(loggedInUser.getUsername())) {
+                    UserModel existingUser = mapper.findByUsername(newUsername);
+                    if (existingUser != null) {
+                        userProfileView.showMessage("Username sudah digunakan!");
+                        return;
+                    }
                 }
-            }
 
-            // Cek apakah email baru sudah digunakan (jika email diubah)
-            String newEmail = userProfileView.getEmail();
-            if (!newEmail.equals(loggedInUser.getEmail())) {
-                UserModel existingUser = mapper.findByEmail(newEmail);
-                if (existingUser != null) {
-                    userProfileView.showMessage("Email sudah terdaftar!");
-                    return;
+                // Cek apakah email baru sudah digunakan (jika email diubah)
+                String newEmail = userProfileView.getEmail();
+                if (!newEmail.equals(loggedInUser.getEmail())) {
+                    UserModel existingUser = mapper.findByEmail(newEmail);
+                    if (existingUser != null) {
+                        userProfileView.showMessage("Email sudah terdaftar!");
+                        return;
+                    }
                 }
+
+                // Update profil di database
+                int result = mapper.updateProfile(
+                        loggedInUser.getId(),
+                        newUsername,
+                        newEmail,
+                        loggedInUser.getPhotoPath(),
+                        userProfileView.getAddress(),
+                        userProfileView.getPhoneNumber()
+                );
+
+                session.commit();
+
+                if (result > 0) {
+                    // Update model dengan data baru
+                    loggedInUser.setUsername(newUsername);
+                    loggedInUser.setEmail(newEmail);
+                    loggedInUser.setAddress(userProfileView.getAddress());
+                    loggedInUser.setPhoneNumber(userProfileView.getPhoneNumber());
+
+                    userProfileView.showMessage("Profil berhasil diperbarui!");
+                } else {
+                    userProfileView.showMessage("Gagal memperbarui profil!");
+                }
+            } catch (Exception ex) {
+                userProfileView.showMessage("Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
-
-            int result = mapper.updateProfile(
-                loggedInUser.getId(),
-                newUsername,
-                newEmail,
-                loggedInUser.getPhotoPath(),
-                userProfileView.getAddress(),
-                userProfileView.getPhoneNumber(),
-                    userProfileView.getRoleId()
-            );
-
-            session.commit();
-
-            if (result > 0) {
-                // Update model dengan data baru
-                loggedInUser.setUsername(newUsername);
-                loggedInUser.setEmail(newEmail);
-                loggedInUser.setAddress(userProfileView.getAddress());
-                loggedInUser.setPhoneNumber(userProfileView.getPhoneNumber());
-
-                userProfileView.showMessage("Profil berhasil diperbarui!");
-            } else {
-                userProfileView.showMessage("Gagal memperbarui profil!");
-            }
-        } catch (Exception ex) {
-            userProfileView.showMessage("Error: " + ex.getMessage());
-            ex.printStackTrace();
         }
-    }
 
     private boolean validateProfileInput() {
         String username = userProfileView.getUsername();
